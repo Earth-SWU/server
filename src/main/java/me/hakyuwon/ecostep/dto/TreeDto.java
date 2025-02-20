@@ -1,7 +1,7 @@
-package me.hakyuwon.springbootdeveloper.dto;
+package me.hakyuwon.ecostep.dto;
 
-import me.hakyuwon.springbootdeveloper.enums.TreeLevel;
-import me.hakyuwon.springbootdeveloper.enums.TreeType;
+import me.hakyuwon.ecostep.enums.TreeLevel;
+import me.hakyuwon.ecostep.enums.TreeType;
 
 import java.math.BigDecimal;
 

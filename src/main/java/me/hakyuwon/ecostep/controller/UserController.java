@@ -1,8 +1,8 @@
-package me.hakyuwon.springbootdeveloper.controller;
+package me.hakyuwon.ecostep.controller;
 
 import lombok.RequiredArgsConstructor;
-import me.hakyuwon.springbootdeveloper.dto.UserDto;
-import me.hakyuwon.springbootdeveloper.service.UserService;
+import me.hakyuwon.ecostep.dto.UserDto;
+import me.hakyuwon.ecostep.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;

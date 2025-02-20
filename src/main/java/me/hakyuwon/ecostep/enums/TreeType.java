@@ -1,4 +1,4 @@
-package me.hakyuwon.springbootdeveloper.enums;
+package me.hakyuwon.ecostep.enums;
 
 import lombok.Getter;
 

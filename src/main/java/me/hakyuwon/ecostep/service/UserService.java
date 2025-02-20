@@ -1,12 +1,11 @@
-package me.hakyuwon.springbootdeveloper.service;
+package me.hakyuwon.ecostep.service;
 
 import lombok.RequiredArgsConstructor;
-import me.hakyuwon.springbootdeveloper.domain.User;
-import me.hakyuwon.springbootdeveloper.dto.UserDto;
-import me.hakyuwon.springbootdeveloper.repository.UserRepository;
+import me.hakyuwon.ecostep.domain.User;
+import me.hakyuwon.ecostep.dto.UserDto;
+import me.hakyuwon.ecostep.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service

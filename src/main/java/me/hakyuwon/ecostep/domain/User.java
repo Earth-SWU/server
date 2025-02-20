@@ -1,4 +1,4 @@
-package me.hakyuwon.springbootdeveloper.domain;
+package me.hakyuwon.ecostep.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

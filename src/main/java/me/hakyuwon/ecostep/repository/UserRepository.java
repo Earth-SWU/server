@@ -1,6 +1,6 @@
-package me.hakyuwon.springbootdeveloper.repository;
+package me.hakyuwon.ecostep.repository;
 
-import me.hakyuwon.springbootdeveloper.domain.User;
+import me.hakyuwon.ecostep.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
