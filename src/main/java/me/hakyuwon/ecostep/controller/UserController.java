@@ -14,7 +14,7 @@ public class UserController {
     private final UserService userService;
 
     // 회원가입
-    @PostMapping("/api/users/signup")
+    @PostMapping("/api/signup")
     public ResponseEntity<UserDto.UserSignupResponseDto> signup(@RequestBody UserDto.UserSignupRequestDto request){
         UserDto.UserSignupResponseDto signupResponse = userService.signUp(request);
         // 회원가입 후 로그인 페이지로

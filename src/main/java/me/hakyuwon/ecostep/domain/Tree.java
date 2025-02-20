@@ -29,4 +29,8 @@ public class Tree extends BaseEntity {
     @Column(name = "fertilizer", nullable = false)
     private Integer fertilizer = 0;
 
+    @OneToOne
+    @JoinColumn(name = "user_id") // 'user'와 연결될 외래키 칼럼 이름
+    private User user;
+
 }
