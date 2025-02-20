@@ -1,0 +1,31 @@
+package me.hakyuwon.springbootdeveloper.controller;
+
+import lombok.RequiredArgsConstructor;
+import me.hakyuwon.springbootdeveloper.dto.UserDto;
+import me.hakyuwon.springbootdeveloper.service.UserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+@RequiredArgsConstructor
+@Controller
+public class UserController {
+    private final UserService userService;
+
+    // 회원가입
+    @PostMapping("/api/users/signup")
+    public ResponseEntity<UserDto.UserSignupResponseDto> signup(@RequestBody UserDto.UserSignupRequestDto request){
+        UserDto.UserSignupResponseDto signupResponse = userService.signUp(request);
+        // 회원가입 후 로그인 페이지로
+        return ResponseEntity.ok().body(signupResponse);
+    }
+
+    //로그인
+    @PostMapping("/api/users/login")
+    public ResponseEntity<UserDto.UserLoginResponseDto> login(@RequestBody UserDto.UserLoginRequestDto request){
+        UserDto.UserLoginResponseDto loginResponse = userService.signIn(request);
+        return ResponseEntity.ok().body(loginResponse);
+    }
+
+}

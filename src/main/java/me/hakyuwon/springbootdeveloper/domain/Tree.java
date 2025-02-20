@@ -12,7 +12,7 @@ public class Tree extends BaseEntity {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     @Column(name = "tree_id", updatable = false)
-    private Long id;
+    private Long treeId;
 
     @Column(name = "tree_name", nullable = false)
     private String treeName;
