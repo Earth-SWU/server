@@ -22,10 +22,10 @@ public class UserController {
     }
 
     //로그인
-    @PostMapping("/api/users/login")
+    /*@PostMapping("/api/users/login")
     public ResponseEntity<UserDto.UserLoginResponseDto> login(@RequestBody UserDto.UserLoginRequestDto request){
         UserDto.UserLoginResponseDto loginResponse = userService.signIn(request);
         return ResponseEntity.ok().body(loginResponse);
-    }
+    }*/
 
 }

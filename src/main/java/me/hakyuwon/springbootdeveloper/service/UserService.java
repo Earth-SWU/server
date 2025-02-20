@@ -31,9 +31,9 @@ public class UserService {
                 .build();
     }
 
-    @Transactional
+    /*@Transactional
     public UserDto.UserLoginResponseDto signIn(UserDto.UserLoginRequestDto userDto){
 
-    }
+    }*/
 
 }
