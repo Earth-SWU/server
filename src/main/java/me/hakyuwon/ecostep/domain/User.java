@@ -2,6 +2,7 @@ package me.hakyuwon.ecostep.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import me.hakyuwon.ecostep.enums.UserStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,6 +29,12 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "phonenumber", nullable = false)
+    private String phoneNumber;
+
+    @Column(name = "status", nullable = false)
+    private UserStatus status;
+
     @Column(name = "reward", nullable = false)
     private Boolean reward = false;
 
@@ -35,11 +42,12 @@ public class User extends BaseEntity implements UserDetails {
     private Tree tree;
 
     @Builder
-    public User(String email, String password, Tree tree) {
+    public User(String email, String password, String phoneNumber, UserStatus status, Tree tree) {
         this.email = email;
         this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.status = status;
         this.tree = tree;
-
     }
 
     @Override
@@ -49,7 +57,7 @@ public class User extends BaseEntity implements UserDetails {
         }
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
-    // 특정 이메일이 관리자 역할을 가지도록 설정
+    // 특정 이메일이 관리자 역할을 가짐
 
     @Override
     public String getUsername() {

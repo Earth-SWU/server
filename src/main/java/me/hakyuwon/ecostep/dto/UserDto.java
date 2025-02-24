@@ -1,5 +1,6 @@
 package me.hakyuwon.ecostep.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,9 @@ public class UserDto {
     private TreeDto tree;
 
     @Getter
+    @NoArgsConstructor
     public static class UserSignupRequestDto {
+        @NotBlank(message = "이메일 주소를 입력하세요")
         private String email;
         private String password;
         private String treename;
@@ -21,7 +24,6 @@ public class UserDto {
 
     @Builder
     @Getter
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class UserSignupResponseDto {
         private String email;
@@ -29,6 +31,7 @@ public class UserDto {
     }
 
     @Getter
+    @NoArgsConstructor
     public static class UserLoginRequestDto {
         private String email;
         private String password;
@@ -36,7 +39,6 @@ public class UserDto {
 
     @Builder
     @Getter
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class UserLoginResponseDto {
         private String email;
