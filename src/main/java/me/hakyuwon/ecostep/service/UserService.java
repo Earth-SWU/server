@@ -1,10 +1,14 @@
 package me.hakyuwon.ecostep.service;
 
 import lombok.RequiredArgsConstructor;
+import me.hakyuwon.ecostep.config.jwt.TokenProvider;
 import me.hakyuwon.ecostep.domain.User;
 import me.hakyuwon.ecostep.dto.UserDto;
 import me.hakyuwon.ecostep.dto.UserSignUpRequest;
 import me.hakyuwon.ecostep.repository.UserRepository;
+import org.antlr.v4.runtime.Token;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,8 +18,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final TokenProvider tokenProvider;
 
-    // user 엔티티 객체 생성, 저장
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, TokenProvider tokenProvider) {
+        this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.tokenProvider = tokenProvider;
+    }
+
+    // user 엔티티 객체 생성, 저장 (회원가입)
     public UserDto.UserSignupResponseDto signUp(UserSignUpRequest userDto) {
         // 이메일 중복 검증
         if (userRepository.existsByEmail(userDto.getEmail())){
@@ -38,9 +49,20 @@ public class UserService {
                 .build();
     }
 
-    @Transactional
+    // 로그인
     public UserDto.UserLoginResponseDto logIn(UserDto.UserLoginRequestDto userDto){
 
+        User user = userRepository.findByEmail(userDto.getEmail())
+                .orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        if (userDto.getPassword() == null || !bCryptPasswordEncoder.matches(userDto.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
+        }
+
+        String token = tokenProvider.createToken(user.getEmail());
+        return UserDto.UserLoginResponseDto.builder()
+                .email(user.getEmail())
+                .token(token)
+                .build();
     }
 
 }

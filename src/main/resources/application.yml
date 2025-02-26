@@ -13,3 +13,6 @@ spring:
       hibernate:
         show-sql: true
         format_sql: true
+
+jwt:
+  secret: Ymx1ZWtub3Rpc2ZhbGxpbmdpd2FzaG9sZGluZ29uZm9yeW91

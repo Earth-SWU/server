@@ -13,15 +13,6 @@ public class UserDto {
     private Boolean reward; // 리워드 상태
     private TreeDto tree;
 
-    @Getter
-    @NoArgsConstructor
-    public static class UserSignupRequestDto {
-        @NotBlank(message = "이메일 주소를 입력하세요")
-        private String email;
-        private String password;
-        private String treename;
-    }
-
     @Builder
     @Getter
     @AllArgsConstructor
@@ -40,8 +31,9 @@ public class UserDto {
     @Builder
     @Getter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class UserLoginResponseDto {
         private String email;
-        // private JwtToken token;
+        private String token;
     }
 }
