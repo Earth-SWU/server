@@ -1,8 +1,13 @@
 package me.hakyuwon.ecostep.controller;
 
+import io.jsonwebtoken.Claims;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import me.hakyuwon.ecostep.config.jwt.TokenProvider;
 import me.hakyuwon.ecostep.dto.UserDto;
+import me.hakyuwon.ecostep.dto.UserLoginRequest;
 import me.hakyuwon.ecostep.dto.UserSignUpRequest;
+import me.hakyuwon.ecostep.service.MailService;
 import me.hakyuwon.ecostep.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -10,10 +15,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+
 @RequiredArgsConstructor
 @Controller
 public class UserController {
     private final UserService userService;
+    private final TokenProvider tokenProvider;
+    private final MailService mailService;
 
     // 회원가입
     @PostMapping("/api/users/signup")
@@ -25,24 +34,23 @@ public class UserController {
 
     // 로그인
     @PostMapping("/api/users/login")
-    public ResponseEntity<UserDto.UserLoginResponseDto> login(@RequestBody UserDto.UserLoginRequestDto request){
+    public ResponseEntity<UserDto.UserLoginResponseDto> login(@RequestBody UserLoginRequest request){
         UserDto.UserLoginResponseDto loginResponse = userService.logIn(request);
         return ResponseEntity.ok().body(loginResponse);
     }
 
-    // 로그아웃
-    @PostMapping("/api/users/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token) {
-        userService.logout(token);
-        return ResponseEntity.ok().build(); // HTTP 200 응답 반환
-    }
-
-
     // 회원 탈퇴
-    @DeleteMapping("/api/users/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id){
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/api/users/delete")
+    public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token) {
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7); // Bearer을 제거하고 token만 남겨두는 과정
+        }
+
+        Claims claims = tokenProvider.getClaims(token); // 토큰에서 payload 추출
+        String email = claims.getSubject(); // payload의 sub인 email을 추출
+
+        userService.deleteUser(email); // 그 이메일로 delete 실행
+        return ResponseEntity.ok("회원 탈퇴 성공");
     }
 
     // 메인 화면
@@ -53,4 +61,13 @@ public class UserController {
 
         return "User Email: " + email;
     }
+
+    // 인증 메일 전송
+    @ResponseBody
+    @PostMapping("/api/emailCheck")
+    public String emailCheck(@RequestBody UserDto.MailDto mailDto) throws MessagingException, UnsupportedEncodingException {
+        String authCode = mailService.sendSimpleMessage(mailDto.getEmail());
+        return authCode;
+    }
+
 }

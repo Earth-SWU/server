@@ -51,7 +51,7 @@ public class TokenProvider {
     }
 
     // JWT에서 Claims 추출
-    private Claims getClaims(String token) {
+    public Claims getClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)

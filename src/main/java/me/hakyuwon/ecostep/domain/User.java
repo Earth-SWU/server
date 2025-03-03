@@ -23,13 +23,13 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "user_id", updatable = false)
     private Long userId;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "phonenumber", nullable = false)
+    @Column(name = "phonenumber", nullable = false, unique = true)
     private String phoneNumber;
 
     @Column(name = "status", nullable = false)

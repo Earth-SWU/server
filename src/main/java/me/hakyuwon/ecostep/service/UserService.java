@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.config.jwt.TokenProvider;
 import me.hakyuwon.ecostep.domain.User;
 import me.hakyuwon.ecostep.dto.UserDto;
+import me.hakyuwon.ecostep.dto.UserLoginRequest;
 import me.hakyuwon.ecostep.dto.UserSignUpRequest;
 import me.hakyuwon.ecostep.repository.UserRepository;
 import org.antlr.v4.runtime.Token;
@@ -13,7 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
+import java.util.Optional;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -50,7 +52,7 @@ public class UserService {
     }
 
     // 로그인
-    public UserDto.UserLoginResponseDto logIn(UserDto.UserLoginRequestDto userDto){
+    public UserDto.UserLoginResponseDto logIn(UserLoginRequest userDto){
 
         User user = userRepository.findByEmail(userDto.getEmail())
                 .orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다."));
@@ -63,6 +65,16 @@ public class UserService {
                 .email(user.getEmail())
                 .token(token)
                 .build();
+    }
+
+    // 회원 탈퇴
+    @Transactional
+    public void deleteUser(String email){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        userRepository.delete(user);
+
     }
 
 }

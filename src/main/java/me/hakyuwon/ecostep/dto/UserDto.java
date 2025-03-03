@@ -1,10 +1,7 @@
 package me.hakyuwon.ecostep.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 public class UserDto {
     private Long userId; // 사용자 ID (숫자형 기본키)
@@ -18,14 +15,7 @@ public class UserDto {
     @AllArgsConstructor
     public static class UserSignupResponseDto {
         private String email;
-        private String treename;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    public static class UserLoginRequestDto {
-        private String email;
-        private String password;
+        // private String treename;
     }
 
     @Builder
@@ -35,5 +25,12 @@ public class UserDto {
     public static class UserLoginResponseDto {
         private String email;
         private String token;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class MailDto {
+        private String email;
     }
 }
