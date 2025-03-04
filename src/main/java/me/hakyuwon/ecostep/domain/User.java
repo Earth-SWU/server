@@ -21,7 +21,7 @@ public class User extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", updatable = false)
-    private Long userId;
+    private Long id;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
@@ -32,8 +32,8 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "phonenumber", nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(name = "status", nullable = false)
-    private UserStatus status;
+    /*@Column(name = "status", nullable = false) 우선 제외
+    private UserStatus status;*/
 
     @Column(name = "reward", nullable = false)
     private Boolean reward = false;
@@ -42,11 +42,11 @@ public class User extends BaseEntity implements UserDetails {
     private Tree tree;
 
     @Builder
-    public User(String email, String password, String phoneNumber, UserStatus status, Tree tree) {
+    public User(String email, String password, String phoneNumber, Tree tree) {
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
-        this.status = status;
+        //this.status = status;
         this.tree = tree;
     }
 

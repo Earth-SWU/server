@@ -3,9 +3,15 @@ package me.hakyuwon.ecostep.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import me.hakyuwon.ecostep.enums.MissionType;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 public class UserMission extends BaseEntity {
     @Id
@@ -22,4 +28,7 @@ public class UserMission extends BaseEntity {
 
     @OneToOne(mappedBy = "userMission", cascade = CascadeType.ALL)
     private CarbonReduction carbonReduction;
+
+    private LocalDateTime completedAt;
+
 }

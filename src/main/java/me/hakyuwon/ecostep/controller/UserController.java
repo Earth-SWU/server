@@ -24,6 +24,12 @@ public class UserController {
     private final TokenProvider tokenProvider;
     private final MailService mailService;
 
+    // 그냥 처음
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/index.html";
+    }
+
     // 회원가입
     @PostMapping("/api/users/signup")
     public ResponseEntity<UserDto.UserSignupResponseDto> signup(@RequestBody UserSignUpRequest request){

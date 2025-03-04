@@ -23,6 +23,7 @@ public class UserDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UserLoginResponseDto {
+        private String userId;
         private String email;
         private String token;
     }

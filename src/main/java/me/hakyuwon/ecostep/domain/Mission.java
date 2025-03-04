@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import me.hakyuwon.ecostep.enums.MissionType;
 
 import java.math.BigDecimal;
 
@@ -17,8 +18,8 @@ public class Mission {
     @Column(name="mission_id", updatable = false)
     private Long id;
 
-    @Column(name = "mission_name", nullable = false)
-    private String missionName;
+    @Enumerated(EnumType.STRING)
+    private MissionType missionType;
 
     @Column(name = "description", nullable = false)
     private String description;

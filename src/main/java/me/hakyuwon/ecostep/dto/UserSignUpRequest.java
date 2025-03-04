@@ -24,8 +24,8 @@ public class UserSignUpRequest {
     @NotBlank(message="번호를 입력해 주세요")
     private String phoneNumber;
 
-    @NotBlank(message="직업을 선택해 주세요")
-    private UserStatus status;
+    /*@NotBlank(message="직업을 선택해 주세요")
+    private UserStatus status;*/
 
     public String getEmail() {
         return email;
@@ -36,7 +36,6 @@ public class UserSignUpRequest {
                 .email(this.email)
                 .password(this.password)
                 .phoneNumber(this.phoneNumber)
-                .status(this.status)
                 .build();
     }
 }
