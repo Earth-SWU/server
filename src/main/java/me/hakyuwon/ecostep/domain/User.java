@@ -32,8 +32,6 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "phonenumber", nullable = false, unique = true)
     private String phoneNumber;
 
-    /*@Column(name = "status", nullable = false) 우선 제외
-    private UserStatus status;*/
 
     @Column(name = "reward", nullable = false)
     private Boolean reward = false;
@@ -42,12 +40,10 @@ public class User extends BaseEntity implements UserDetails {
     private Tree tree;
 
     @Builder
-    public User(String email, String password, String phoneNumber, Tree tree) {
+    public User(String email, String password, String phoneNumber) {
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
-        //this.status = status;
-        this.tree = tree;
     }
 
     @Override
@@ -67,6 +63,7 @@ public class User extends BaseEntity implements UserDetails {
     public String getPassword() {
         return password;
     }
+
     // 인증 사용자의 계정 유효 기간 정보를 반환
     // false: 기간 만료
     @Override
@@ -87,9 +84,8 @@ public class User extends BaseEntity implements UserDetails {
     public boolean isCredentialsNonExpired() {
         return true;
     }
+
     // 인증 사용자의 활성화 상태를 반환
-    // false: 비활성화 상태
-    // enabled.equals("1") 의 값은 개인이 설정한 값으로 커스터마이징해주세요.
     @Override
     public boolean isEnabled() {
         if (enabled.equals("1")) {
