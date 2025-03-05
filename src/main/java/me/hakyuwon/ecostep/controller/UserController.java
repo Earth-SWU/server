@@ -24,7 +24,6 @@ public class UserController {
     private final TokenProvider tokenProvider;
     private final MailService mailService;
 
-    // 그냥 처음
     @GetMapping("/")
     public String home() {
         return "redirect:/index.html";

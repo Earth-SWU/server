@@ -26,11 +26,11 @@ public class MissionService {
     private final TreeRepository treeRepository;
 
     @Transactional
-    public String completeMission(Long userId, MissionType missionType) {
+    public String completeMission(Long userId, Long missionId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        Mission mission = missionRepository.findByMissionType(missionType)
+        Mission mission = missionRepository.findById(missionId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 미션입니다."));
 
         Tree tree = treeRepository.findByUser(user)
@@ -40,7 +40,7 @@ public class MissionService {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
 
         // 오늘 해당 미션을 이미 완료했는지 확인
-        if (userMissionRepository.existsByUserIdAndMission_MissionTypeAndCompletedAtAfter(userId, missionType, startOfDay)) {
+        if (userMissionRepository.existsByUserAndMissionIdAndCompletedAtAfter(user, mission, startOfDay)) {
             return "이미 완료한 미션입니다.";
         }
 

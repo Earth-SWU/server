@@ -41,7 +41,6 @@ public class UserService {
                 .email(newUser.getEmail())
                 .password(bCryptPasswordEncoder.encode(newUser.getPassword()))
                 .phoneNumber(newUser.getPhoneNumber())
-                .status(newUser.getStatus())
                 .build();
 
         userRepository.save(newUser);
