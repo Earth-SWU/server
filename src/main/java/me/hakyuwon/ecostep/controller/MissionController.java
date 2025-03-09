@@ -40,7 +40,6 @@ public class MissionController {
         return ResponseEntity.ok("매일 출석하고 물 받아요!");
     }
 
-
     // 영수증 인증 미션
 
     // 텀블러 사용 미션

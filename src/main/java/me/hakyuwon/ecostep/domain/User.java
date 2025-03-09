@@ -2,7 +2,6 @@ package me.hakyuwon.ecostep.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import me.hakyuwon.ecostep.enums.UserStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,9 +28,8 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "phonenumber", nullable = false, unique = true)
+    @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
-
 
     @Column(name = "reward", nullable = false)
     private Boolean reward = false;

@@ -3,6 +3,7 @@ package me.hakyuwon.ecostep.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
 import java.math.BigDecimal;
 
 @Entity
@@ -14,23 +15,31 @@ public class Tree extends BaseEntity {
     @Column(name = "tree_id", updatable = false)
     private Long id;
 
-    @Column(name = "tree_name", nullable = false)
+    @Column(name = "tree_name", nullable = true)
     private String treeName;
 
     @Column(name = "tree_growth", nullable = false)
-    private BigDecimal growth; // 성장 퍼센트
+    private int growth; // 성장 퍼센트
 
     @Column(name = "tree_level", nullable = false)
-    private Integer level = 1; // 나무 레벨
+    private int level;
 
     @Column(name = "water", nullable = false)
-    private Integer water = 0;
+    private int water;
 
     @Column(name = "fertilizer", nullable = false)
-    private Integer fertilizer = 0;
+    private int fertilizer;
 
     @OneToOne
-    @JoinColumn(name = "user_id") // 'user'와 연결될 외래키 칼럼 이름
+    @JoinColumn(name = "user_id")
     private User user;
+
+    private static final int WATER_GROWTH = 15;  // 물 1개당 성장 %
+    private static final int FERTILIZER_GROWTH = 30;  // 비료 1개당 성장 %
+
+    public void applyItems(int waterGain, int fertilizerGain) {
+        this.water += waterGain;
+        this.fertilizer += fertilizerGain;
+    }
 
 }

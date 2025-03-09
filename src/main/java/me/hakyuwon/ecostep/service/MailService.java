@@ -7,7 +7,9 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -15,21 +17,15 @@ public class MailService {
     private final JavaMailSender mailSender;
     private static final String senderEmail = "weecostep@gmail.com";
 
+    // 인증번호 저장을 위한 Map
+    private final Map<String, String> verificationCodes = new ConcurrentHashMap<>();
+
+
     // 랜덤으로 숫자 생성
     public String createNumber() {
         Random random = new Random();
-        StringBuilder key = new StringBuilder();
-
-        for (int i = 0; i < 8; i++) { // 인증 코드 8자리
-            int index = random.nextInt(3); // 0~2까지 랜덤, 랜덤값으로 switch문 실행
-
-            switch (index) {
-                case 0 -> key.append((char) (random.nextInt(26) + 97)); // 소문자
-                case 1 -> key.append((char) (random.nextInt(26) + 65)); // 대문자
-                case 2 -> key.append(random.nextInt(10)); // 숫자
-            }
-        }
-        return key.toString();
+        int number = random.nextInt(10000);
+        return String.format("%04d", number); // 4자리 숫자
     }
 
     public MimeMessage createMail(String mail, String number) throws MessagingException {
@@ -59,5 +55,11 @@ public class MailService {
         }
 
         return number; // 생성된 인증번호 반환
+    }
+
+    // 인증번호 확인
+    public boolean verifyCode(String email, String inputCode) {
+        String storedCode = verificationCodes.get(email);
+        return storedCode != null && storedCode.equals(inputCode);
     }
 }

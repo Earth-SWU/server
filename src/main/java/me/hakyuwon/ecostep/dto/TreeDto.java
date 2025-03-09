@@ -1,6 +1,7 @@
 package me.hakyuwon.ecostep.dto;
 
-import me.hakyuwon.ecostep.enums.TreeLevel;
+import lombok.*;
+import me.hakyuwon.ecostep.domain.Tree;
 import me.hakyuwon.ecostep.enums.TreeType;
 
 import java.math.BigDecimal;
@@ -8,9 +9,17 @@ import java.math.BigDecimal;
 public class TreeDto {
     private Long id;
     private String treeName;
-    private TreeType treeType;
-    private TreeLevel treeLevel;
-    private BigDecimal treeGrowth;
-    private Integer water;
-    private Integer fertilizer;
+    private int level;
+    private int growth;
+    private int water;
+    private int fertilizer;
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class TreeRequestDto {
+        private String treeName;
+    }
 }

@@ -2,6 +2,7 @@ package me.hakyuwon.ecostep.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,14 +20,14 @@ public class UserSignUpRequest {
     private String email;
 
     @NotBlank(message="비밀번호를 입력해 주세요")
+    @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
     private String password;
+
+    @NotBlank
+    private String confirmPassword;
 
     @NotBlank(message="번호를 입력해 주세요")
     private String phoneNumber;
-
-    public String getEmail() {
-        return email;
-    }
 
     public User toEntity(){
         return User.builder()

@@ -8,14 +8,15 @@ public class UserDto {
     private String email; // 사용자 이메일 (기본 아이디)
     private String password; // 사용자 패스워드
     private Boolean reward; // 리워드 상태
+    private String phoneNumber;
     private TreeDto tree;
 
     @Builder
     @Getter
     @AllArgsConstructor
     public static class UserSignupResponseDto {
+        private Long userId;
         private String email;
-        // private String treename;
     }
 
     @Builder
@@ -23,15 +24,7 @@ public class UserDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UserLoginResponseDto {
-        private String userId;
         private String email;
         private String token;
-    }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class MailDto {
-        private String email;
     }
 }

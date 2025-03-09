@@ -4,14 +4,19 @@ import io.jsonwebtoken.Claims;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.config.jwt.TokenProvider;
+import me.hakyuwon.ecostep.dto.TreeResponseDto;
 import me.hakyuwon.ecostep.dto.UserDto;
 import me.hakyuwon.ecostep.dto.UserLoginRequest;
 import me.hakyuwon.ecostep.dto.UserSignUpRequest;
 import me.hakyuwon.ecostep.service.MailService;
+import me.hakyuwon.ecostep.service.TreeService;
 import me.hakyuwon.ecostep.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 @Controller
 public class UserController {
     private final UserService userService;
+    private final TreeService treeService;
     private final TokenProvider tokenProvider;
     private final MailService mailService;
 
@@ -60,19 +66,46 @@ public class UserController {
 
     // 메인 화면
     @GetMapping("/api/home")
-    public String getHome(){
+    public ResponseEntity<TreeResponseDto> getHome(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = (String) authentication.getPrincipal();
+        String userId = (String) authentication.getPrincipal();
 
-        return "User Email: " + email;
+        // 트리 정보 가져오기
+        TreeResponseDto treeInfo = treeService.getTreeInfo(Long.parseLong(userId));
+
+        return ResponseEntity.ok(treeInfo);
     }
 
     // 인증 메일 전송
     @ResponseBody
-    @PostMapping("/api/emailCheck")
-    public String emailCheck(@RequestBody UserDto.MailDto mailDto) throws MessagingException, UnsupportedEncodingException {
-        String authCode = mailService.sendSimpleMessage(mailDto.getEmail());
-        return authCode;
+    @PostMapping("/api/email-check")
+    public ResponseEntity<String> emailCheck(@RequestParam String email) throws MessagingException, UnsupportedEncodingException {
+        try {
+            mailService.sendSimpleMessage(email);
+            return ResponseEntity.ok("인증번호가 발송되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("메일 발송 실패");
+        }
     }
+
+    // 인증 번호 확인
+    @PostMapping("/api/verify-code")
+    public ResponseEntity<String> verifyCode(@RequestParam String email, @RequestParam String code) throws MessagingException, UnsupportedEncodingException {
+        if (mailService.verifyCode(email, code)) {
+            return ResponseEntity.ok("인증 성공");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 실패");
+        }
+    }
+
+    /* 비밀번호 재설정
+    @PostMapping("/api/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String code, @RequestParam String newPassword) {
+        if (mailService.resetPassword(email, code, newPassword)) {
+            return ResponseEntity.ok("비밀번호가 변경되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증번호가 올바르지 않습니다.");
+        }
+    }*/
 
 }

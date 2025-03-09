@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,12 @@ public class MissionService {
     private final UserMissionRepository userMissionRepository;
     private final UserRepository userRepository;
     private final TreeRepository treeRepository;
+
+    // 물 주는 미션 ID 목록
+    private static final Set<Long> WATER_MISSION_IDS = Set.of(1L, 2L, 3L, 4L);
+    // 비료 주는 미션 ID 목록
+    private static final Set<Long> FERTILIZER_MISSION_IDS = Set.of(5L, 6L);
+
 
     @Transactional
     public String completeMission(Long userId, Long missionId) {
@@ -49,10 +56,14 @@ public class MissionService {
         userMission.setMission(mission);
         userMission.setCompletedAt(LocalDateTime.now());
 
-        /*tree.setWater(tree.getWater() + 1);
-        tree.setFertilizer(tree.getFertilizer() + 1); 미션에 맞게 수정 예쩡*/
+        if (WATER_MISSION_IDS.contains(missionId)) {
+            tree.applyItems(1,0);
+        } else if (FERTILIZER_MISSION_IDS.contains(missionId)) {
+            tree.applyItems(0,1);
+        }
 
         userMissionRepository.save(userMission);
+        treeRepository.save(tree);
         return "미션 완료!";
     }
 }
