@@ -40,11 +40,15 @@ public class MissionController {
         return ResponseEntity.ok("매일 출석하고 물 받아요!");
     }
 
-    // 영수증 인증 미션
+    /* 영수증 인증 미션
+    @PostMapping("/receipt")
+    public ResponseEntity<String> receiptMission(@RequestBody UserMissionDto userMissionDto) {
+
+    }*/
 
     // 텀블러 사용 미션
 
-    // 5000보 이상 걷기
+    // 3000보 이상 걷기
 
     // 친환경 물품 구매
 
