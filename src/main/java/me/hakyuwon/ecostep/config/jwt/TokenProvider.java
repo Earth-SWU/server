@@ -13,8 +13,8 @@ import java.util.Date;
 @Component
 public class TokenProvider {
 
-    private final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 60; //1시간
-    private final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24 * 7; // 7일
+    private final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 60 * 6; // 6시간
+    private final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24 * 30; // 30일
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -26,6 +26,16 @@ public class TokenProvider {
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis()+ACCESS_TOKEN_VALIDITY))
                 .signWith(SignatureAlgorithm.HS256,secretKey)
+                .compact();
+    }
+
+    // 리프레시 토큰 생성
+    public String createRefreshToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY)) // 7일 동안 유효
+                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
@@ -56,5 +66,23 @@ public class TokenProvider {
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public String generateAccessTokenFromRefresh(String refreshToken) {
+        // 리프레시 토큰에서 사용자 정보 추출
+        String email = extractUserEmail(refreshToken);  // 리프레시 토큰에서 이메일을 추출
+
+        // 새로운 액세스 토큰 생성
+        return createToken(email);  // 이메일을 사용해 새로운 액세스 토큰을 생성
+    }
+
+    public boolean validateRefreshToken(String refreshToken) {
+        try {
+            // 리프레시 토큰 검증
+            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(refreshToken);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
