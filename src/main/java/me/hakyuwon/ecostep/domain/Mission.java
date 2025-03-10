@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import me.hakyuwon.ecostep.enums.MissionType;
 
 import java.math.BigDecimal;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Mission {
@@ -24,8 +26,8 @@ public class Mission {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(nullable = false, precision = 5, scale = 2)
-    private BigDecimal carbonReduction;
+    @Column(nullable = false)
+    private double carbonReduction;
 
     @Column(nullable = false)
     private int mission_water;
