@@ -73,10 +73,13 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
         }
 
-        String token = tokenProvider.createToken(user.getEmail());
+        String accessToken = tokenProvider.createToken(user.getEmail());
+        String refreshToken = tokenProvider.createRefreshToken(user.getEmail());
+
         return UserDto.UserLoginResponseDto.builder()
                 .email(user.getEmail())
-                .token(token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 

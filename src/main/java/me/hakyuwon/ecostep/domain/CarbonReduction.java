@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Entity
 @Getter
 @NoArgsConstructor
@@ -22,6 +20,6 @@ public class CarbonReduction {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name="rdc_amount",nullable = false, precision = 5, scale = 2)
-    private BigDecimal reductionAmount; // 감축된 탄소량 (kg)
+    @Column(name="rdc_amount",nullable = false)
+    private double reductionAmount = 0; // 감축된 탄소량 (kg)
 }

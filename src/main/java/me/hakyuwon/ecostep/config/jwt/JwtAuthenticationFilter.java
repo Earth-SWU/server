@@ -1,5 +1,6 @@
 package me.hakyuwon.ecostep.config.jwt;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,6 +39,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // "Bearer " 이후의 토큰 값만 추출
         String token = authHeader.substring(7);
         String email = tokenProvider.extractUserEmail(token); // JWT에서 email 추출
+
+        try {
+            email = tokenProvider.extractUserEmail(token); // JWT에서 email 추출
+        } catch (ExpiredJwtException e) {
+            // 만료된 토큰 처리 로직
+            String refreshToken = request.getHeader("Refresh-Token");  // 리프레시 토큰을 헤더에서 가져옴
+
+            if (refreshToken != null && tokenProvider.validateRefreshToken(refreshToken)) {
+                // 리프레시 토큰이 유효한 경우, 새로운 액세스 토큰을 발급하고 응답에 추가
+                String newAccessToken = tokenProvider.generateAccessTokenFromRefresh(refreshToken);
+                response.setHeader("Authorization", "Bearer " + newAccessToken);
+            } else {
+                // 리프레시 토큰이 없거나 유효하지 않은 경우, 로그인이 필요함을 알려줌
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token expired and refresh token is invalid or missing.");
+                return;
+            }
+        }
 
         // SecurityContext에 인증 정보가 없고, email이 존재하는 경우
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {

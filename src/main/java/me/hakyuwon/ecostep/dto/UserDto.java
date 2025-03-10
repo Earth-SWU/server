@@ -11,6 +11,12 @@ public class UserDto {
     private String phoneNumber;
     private TreeDto tree;
 
+    public UserDto(Long id, String email, String treeName) {
+        this.userId = id;
+        this.email = email;
+        this.tree = new TreeDto();
+    }
+
     @Builder
     @Getter
     @AllArgsConstructor
@@ -25,6 +31,7 @@ public class UserDto {
     @NoArgsConstructor
     public static class UserLoginResponseDto {
         private String email;
-        private String token;
+        private String accessToken;
+        private String refreshToken;
     }
 }
