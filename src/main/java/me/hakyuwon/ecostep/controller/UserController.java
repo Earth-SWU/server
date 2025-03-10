@@ -4,10 +4,12 @@ import io.jsonwebtoken.Claims;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.config.jwt.TokenProvider;
+import me.hakyuwon.ecostep.domain.User;
 import me.hakyuwon.ecostep.dto.TreeResponseDto;
 import me.hakyuwon.ecostep.dto.UserDto;
 import me.hakyuwon.ecostep.dto.UserLoginRequest;
 import me.hakyuwon.ecostep.dto.UserSignUpRequest;
+import me.hakyuwon.ecostep.repository.UserRepository;
 import me.hakyuwon.ecostep.service.MailService;
 import me.hakyuwon.ecostep.service.TreeService;
 import me.hakyuwon.ecostep.service.UserService;
@@ -21,6 +23,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Controller
@@ -29,6 +34,7 @@ public class UserController {
     private final TreeService treeService;
     private final TokenProvider tokenProvider;
     private final MailService mailService;
+    private final UserRepository userRepository;
 
     @GetMapping("/")
     public String home() {
@@ -68,10 +74,14 @@ public class UserController {
     @GetMapping("/api/home")
     public ResponseEntity<TreeResponseDto> getHome(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = (String) authentication.getPrincipal();
+        String email = ((UserDetails) authentication.getPrincipal()).getUsername();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        Long userId = user.getId();
 
         // 트리 정보 가져오기
-        TreeResponseDto treeInfo = treeService.getTreeInfo(Long.parseLong(userId));
+        TreeResponseDto treeInfo = treeService.getTreeInfo(userId);
 
         return ResponseEntity.ok(treeInfo);
     }
@@ -96,6 +106,23 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 실패");
         }
+    }
+
+    // 리프레시 토큰 -> 액세스 토큰 갱신
+    @PostMapping("/api/refresh")
+    public ResponseEntity<Map<String, String>> refreshAccessToken(@RequestBody Map<String, String> refreshTokenRequest) {
+        String refreshToken = refreshTokenRequest.get("refreshToken");
+
+        if (refreshToken == null || !tokenProvider.validateRefreshToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("message", "Invalid or expired refresh token"));
+        }
+
+        // 리프레시 토큰으로 새로운 액세스 토큰 발급
+        String newAccessToken = tokenProvider.generateAccessTokenFromRefresh(refreshToken);
+        Map<String, String> response = new HashMap<>();
+        response.put("accessToken", newAccessToken);
+
+        return ResponseEntity.ok(response);
     }
 
     /* 비밀번호 재설정
