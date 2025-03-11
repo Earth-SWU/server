@@ -30,14 +30,9 @@ public class MyPageService {
         // 1. 사용자 정보 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
-        UserDto profile = new UserDto(
-                user.getId(),
-                user.getEmail(),
-                user.getTree().getTreeName()
-        );
 
         // 2. 탄소 감축량 통계 조회
-        List<UserMission> userMissions = (List<UserMission>) userMissionRepository.findByUser(user);
+        List<UserMission> userMissions = userMissionRepository.findByUser(user);
         double totalReduction = userMissions.stream()
                 .mapToDouble(m -> m.getCarbonReduction())
                 .sum();
@@ -47,7 +42,7 @@ public class MyPageService {
         LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
         LocalDateTime startOfMonth = firstDayOfMonth.atStartOfDay();
 
-        List<UserMission> eachMissions = userMissionRepository.countByUserAndCompletedAtAfter(user, startOfMonth);
+        List<UserMission> eachMissions = userMissionRepository.findByUserAndCompletedAtAfter(user, startOfMonth);
         long totalMissions = eachMissions.size();
         // 미션 타입과 각각의 횟수가 저장됨
         Map<String, Long> missionCounts = eachMissions.stream()
@@ -63,6 +58,6 @@ public class MyPageService {
         MissionProgressDto missionProgress = new MissionProgressDto(userId, totalMissions, missionPercentages.size());
 
         // 4. 통합 DTO 생성
-        return new MyPageDto(profile, carbonStats, missionProgress);
+        return new MyPageDto(carbonStats, missionProgress);
     }
 }

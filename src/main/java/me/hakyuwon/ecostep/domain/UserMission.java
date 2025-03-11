@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserMission extends BaseEntity {
+public class UserMission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,5 +41,4 @@ public class UserMission extends BaseEntity {
         this.mission = mission;
         this.completedAt = completedAt;
     }
-
 }

@@ -16,7 +16,7 @@ import java.util.List;
 public class MyPageController {
     private final MyPageService myPageService;
 
-    @GetMapping("/me/{userId}")
+    @GetMapping("/api/me/{userId}")
     public ResponseEntity<MyPageDto> getMyPage(@PathVariable Long userId) {
         MyPageDto myPageDto = myPageService.getMyPage(userId);
         return ResponseEntity.ok(myPageDto);

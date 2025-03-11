@@ -22,4 +22,8 @@ public class TreeDto {
     public static class TreeRequestDto {
         private String treeName;
     }
+
+    public TreeDto(String treeName) {
+        this.treeName = treeName;
+    }
 }

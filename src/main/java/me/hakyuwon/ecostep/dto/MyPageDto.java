@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MyPageDto {
-    private UserDto profile;
     private CarbonStatsDto carbonStats;
     private MissionProgressDto missionProgress;
 }
