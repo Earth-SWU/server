@@ -98,14 +98,13 @@ public class MissionService {
 
         // 미션 타입에 맞는 뱃지 타입을 가져오기
         BadgeType badgeType = mission.getMissionType().getBadgeType();
-        Optional<Badge> badge = badgeRepository.findByName(badgeType.getName());
 
         // 미션 수행 횟수가 조건을 만족하는지 확인
         if (missionCount >= badgeType.getRequiredCount()) {
-            // 뱃지 중복 인증
+            /* 뱃지 중복 인증
             if (userBadgeRepository.existsByUserAndBadge(user, badge)) {
                 return;
-            }
+            }*/
             // 조건을 만족하면 뱃지 부여
             Badge newBadge = new Badge();
             newBadge.setBadgeType(badgeType);
