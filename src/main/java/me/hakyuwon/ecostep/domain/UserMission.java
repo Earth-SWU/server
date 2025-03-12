@@ -30,9 +30,6 @@ public class UserMission {
     @JoinColumn(name = "mission_id", nullable = false)
     private Mission mission;
 
-    /*@OneToOne(mappedBy = "userMission", cascade = CascadeType.ALL)
-    private CarbonReduction carbonReduction;*/
-
     private LocalDateTime completedAt;
 
     @Builder

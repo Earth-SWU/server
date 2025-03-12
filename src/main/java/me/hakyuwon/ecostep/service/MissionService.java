@@ -63,6 +63,7 @@ public class MissionService {
 
         userMissionRepository.save(userMission);
         treeRepository.save(tree);
+        checkBadge(userId, missionId);
         return "미션 완료!";
     }
 
