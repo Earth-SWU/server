@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.domain.Mission;
 import me.hakyuwon.ecostep.domain.User;
 import me.hakyuwon.ecostep.dto.MissionDto;
+import me.hakyuwon.ecostep.dto.StepDataDto;
 import me.hakyuwon.ecostep.dto.UserMissionDto;
 import me.hakyuwon.ecostep.enums.MissionType;
 import me.hakyuwon.ecostep.repository.MissionRepository;
@@ -24,10 +25,6 @@ public class MissionController {
     private final UserMissionRepository userMissionRepository;
     private final UserRepository userRepository;
     private final MissionRepository missionRepository;
-
-    // 미션 목록 조회
-    @GetMapping("/{userId}")
-
 
     // 미션 완료
     @PostMapping("/complete")
@@ -52,6 +49,11 @@ public class MissionController {
     // 텀블러 사용 미션
 
     // 3000보 이상 걷기
+    @PostMapping("/walk")
+    public ResponseEntity<String> walkMission(@RequestBody StepDataDto stepDto) {
+        String result = missionService.checkSteps(stepDto);
+        return ResponseEntity.ok(result);
+    }
 
     // 친환경 물품 구매
 

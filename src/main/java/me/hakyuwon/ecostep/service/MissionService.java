@@ -3,6 +3,7 @@ package me.hakyuwon.ecostep.service;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.domain.*;
+import me.hakyuwon.ecostep.dto.StepDataDto;
 import me.hakyuwon.ecostep.enums.BadgeType;
 import me.hakyuwon.ecostep.enums.MissionType;
 import me.hakyuwon.ecostep.repository.*;
@@ -83,6 +84,26 @@ public class MissionService {
             return "이미 출석을 했어요.";
         }
         return "매일 출석하고 물 받아요!";
+    }
+
+    @Transactional
+    public String checkSteps(StepDataDto stepDataDto) {
+        User user = userRepository.findById(stepDataDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
+        Mission mission = missionRepository.findByMissionType(MissionType.WALK)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 미션입니다."));
+
+        LocalDate today = LocalDate.now();
+        boolean alreadyCompleted = userMissionRepository.existsByUserAndMissionAndCompletedAtAfter(user, mission, today.atStartOfDay());
+
+        int step = stepDataDto.getSteps();
+        if (step>=3000) {
+            if (alreadyCompleted) {
+                return "이미 걸음수 체크를 했어요.";
+            }
+            return "3000보 이상 걷고, 물 받아요!";
+        }
+        else return "아직 걸음수가 모자라요!";
     }
 
     @Transactional
