@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -28,6 +29,7 @@ public class MissionService {
     private static final Set<Long> WATER_MISSION_IDS = Set.of(1L, 2L, 3L, 4L);
     // 비료 주는 미션 ID 목록
     private static final Set<Long> FERTILIZER_MISSION_IDS = Set.of(5L);
+    private final BadgeRepository badgeRepository;
 
 
     @Transactional
@@ -83,6 +85,7 @@ public class MissionService {
         return "매일 출석하고 물 받아요!";
     }
 
+    @Transactional
     public void checkBadge(Long userId, Long missionId) {
 
         User user = userRepository.findById(userId)
@@ -94,19 +97,23 @@ public class MissionService {
         long missionCount = userMissionRepository.countByUserAndMission(user, mission);
 
         // 미션 타입에 맞는 뱃지 타입을 가져오기
-        BadgeType badgeType = mission.getMissionType().getBadgeType(); // Mission의 타입을 기준으로 뱃지 타입 결정
+        BadgeType badgeType = mission.getMissionType().getBadgeType();
+        Optional<Badge> badge = badgeRepository.findByName(badgeType.getName());
 
         // 미션 수행 횟수가 조건을 만족하는지 확인
         if (missionCount >= badgeType.getRequiredCount()) {
+            // 뱃지 중복 인증
+            if (userBadgeRepository.existsByUserAndBadge(user, badge)) {
+                return;
+            }
             // 조건을 만족하면 뱃지 부여
-            Badge badge = new Badge();
-            badge.setType(badgeType);
-            badge.setDescription(badgeType.getName() + "을(를) 달성했습니다!");
+            Badge newBadge = new Badge();
+            newBadge.setBadgeType(badgeType);
+            newBadge.setDescription(badgeType.getName() + "을(를) 달성했습니다!");
 
-            // 유저와 뱃지 연결
             UserBadge userBadge = new UserBadge();
             userBadge.setUser(user);
-            userBadge.setBadge(badge);
+            userBadge.setBadge(newBadge);
             userBadge.setAwardedAt(LocalDate.now());
 
             userBadgeRepository.save(userBadge);

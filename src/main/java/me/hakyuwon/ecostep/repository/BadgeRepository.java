@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface BadgeRepository extends JpaRepository<Badge, Long> {
-    Optional<Badge> findbyBadgeType(BadgeType badgeType);
+    Optional<Badge> findByName(String name);
     boolean existsByBadgeType(BadgeType badgeType);
 }

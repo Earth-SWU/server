@@ -30,7 +30,7 @@ public enum MissionType {
     public BadgeType getBadgeType() {
         switch (this) {
             case ATTENDANCE:
-                return BadgeType.ATTENDANCE_REGULAR;
+                return BadgeType.ATTENDANCE_ECOSTEP;
             case RECEIPT:
                 return BadgeType.RECEIPT_EXPERT;
             case TUMBLER:

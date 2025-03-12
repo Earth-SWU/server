@@ -9,6 +9,7 @@ import me.hakyuwon.ecostep.dto.UserDto;
 import me.hakyuwon.ecostep.dto.UserLoginRequest;
 import me.hakyuwon.ecostep.dto.UserSignUpRequest;
 import me.hakyuwon.ecostep.enums.BadgeType;
+import me.hakyuwon.ecostep.repository.BadgeRepository;
 import me.hakyuwon.ecostep.repository.TreeRepository;
 import me.hakyuwon.ecostep.repository.UserBadgeRepository;
 import me.hakyuwon.ecostep.repository.UserRepository;
@@ -24,13 +25,15 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final TokenProvider tokenProvider;
     private final UserBadgeRepository userBadgeRepository;
+    private final BadgeRepository badgeRepository;
 
-    public UserService(UserRepository userRepository, TreeRepository treeRepository, BCryptPasswordEncoder bCryptPasswordEncoder, TokenProvider tokenProvider, UserBadgeRepository userBadgeRepository) {
+    public UserService(UserRepository userRepository, TreeRepository treeRepository, BCryptPasswordEncoder bCryptPasswordEncoder, TokenProvider tokenProvider, UserBadgeRepository userBadgeRepository, BadgeRepository badgeRepository) {
         this.userRepository = userRepository;
         this.treeRepository = treeRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.tokenProvider = tokenProvider;
         this.userBadgeRepository = userBadgeRepository;
+        this.badgeRepository = badgeRepository;
     }
 
     // user 엔티티 객체 생성, 저장 (회원가입)
@@ -98,12 +101,12 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        Badge newBadge = new Badge();
-        newBadge.setType(BadgeType.IAM_BEGINNER);
+        Badge badge = badgeRepository.findByName("에코스텝 비기너")
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 뱃지입니다."));
 
         UserBadge userBadge = new UserBadge();
         userBadge.setUser(user);
-        userBadge.setBadge(newBadge);
+        userBadge.setBadge(badge);
 
         userBadgeRepository.save(userBadge);
     }

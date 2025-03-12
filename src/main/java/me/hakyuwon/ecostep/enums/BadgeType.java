@@ -4,7 +4,7 @@ public enum BadgeType {
     TUMBLER_MASTER("텀블러 선구자", 5),
     RECEIPT_EXPERT("영수증 분석 전문가", 5),
     WALKING_CHAMP("걷기 챔피언", 5),
-    ATTENDANCE_REGULAR("출석 체크 완벽", 5),
+    ATTENDANCE_ECOSTEP("에코스텝러", 5),
     IAM_BEGINNER("에코스텝 비기너",null),
     IAM_MASTER("에코스텝 마스터",null);
 

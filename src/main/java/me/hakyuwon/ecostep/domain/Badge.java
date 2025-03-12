@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import me.hakyuwon.ecostep.enums.BadgeType;
+
+import javax.print.attribute.standard.MediaSize;
 import java.util.List;
 
 @Getter
@@ -15,11 +17,13 @@ public class Badge {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private BadgeType type;
+    private BadgeType badgeType;
 
     private String name;
     private String description;
-    private int requiredCount;
+
+    @Column(nullable = true)
+    private Integer requiredCount;
 
     @ManyToMany
     private List<Mission> missions;

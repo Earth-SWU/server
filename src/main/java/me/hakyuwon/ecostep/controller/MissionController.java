@@ -25,6 +25,10 @@ public class MissionController {
     private final UserRepository userRepository;
     private final MissionRepository missionRepository;
 
+    // 미션 목록 조회
+    @GetMapping("/{userId}")
+
+
     // 미션 완료
     @PostMapping("/complete")
     public ResponseEntity<String> completeMission(@RequestBody UserMissionDto userMissionDto) {
