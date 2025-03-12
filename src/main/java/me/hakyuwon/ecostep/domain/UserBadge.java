@@ -15,6 +15,7 @@ public class UserBadge {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name="user_id")
     private User user; // 유저
 
     @ManyToOne

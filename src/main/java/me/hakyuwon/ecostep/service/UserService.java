@@ -1,22 +1,21 @@
 package me.hakyuwon.ecostep.service;
 
-import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.config.jwt.TokenProvider;
+import me.hakyuwon.ecostep.domain.Badge;
 import me.hakyuwon.ecostep.domain.Tree;
 import me.hakyuwon.ecostep.domain.User;
+import me.hakyuwon.ecostep.domain.UserBadge;
 import me.hakyuwon.ecostep.dto.UserDto;
 import me.hakyuwon.ecostep.dto.UserLoginRequest;
 import me.hakyuwon.ecostep.dto.UserSignUpRequest;
+import me.hakyuwon.ecostep.enums.BadgeType;
 import me.hakyuwon.ecostep.repository.TreeRepository;
+import me.hakyuwon.ecostep.repository.UserBadgeRepository;
 import me.hakyuwon.ecostep.repository.UserRepository;
-import org.antlr.v4.runtime.Token;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -24,12 +23,14 @@ public class UserService {
     private final TreeRepository treeRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final TokenProvider tokenProvider;
+    private final UserBadgeRepository userBadgeRepository;
 
-    public UserService(UserRepository userRepository,TreeRepository treeRepository, BCryptPasswordEncoder bCryptPasswordEncoder, TokenProvider tokenProvider) {
+    public UserService(UserRepository userRepository, TreeRepository treeRepository, BCryptPasswordEncoder bCryptPasswordEncoder, TokenProvider tokenProvider, UserBadgeRepository userBadgeRepository) {
         this.userRepository = userRepository;
         this.treeRepository = treeRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.tokenProvider = tokenProvider;
+        this.userBadgeRepository = userBadgeRepository;
     }
 
     // user 엔티티 객체 생성, 저장 (회원가입)
@@ -90,5 +91,20 @@ public class UserService {
                 .orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         userRepository.delete(user);
+    }
+
+    // 회원가입 후 뱃지 획득
+    public void firstBadge(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        Badge newBadge = new Badge();
+        newBadge.setType(BadgeType.IAM_BEGINNER);
+
+        UserBadge userBadge = new UserBadge();
+        userBadge.setUser(user);
+        userBadge.setBadge(newBadge);
+
+        userBadgeRepository.save(userBadge);
     }
 }

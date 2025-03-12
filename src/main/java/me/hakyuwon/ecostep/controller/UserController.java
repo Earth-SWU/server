@@ -125,6 +125,13 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    // 회원가입 이후, 첫 뱃지 지급 api
+    @PostMapping("/api/beginner/{userId}")
+    public ResponseEntity<String> assignBeginnerBadge(@PathVariable Long userId) {
+        userService.firstBadge(userId);
+        return ResponseEntity.ok("비기너 뱃지가 지급되었습니다.");
+    }
+
     /* 비밀번호 재설정
     @PostMapping("/api/reset-password")
     public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String code, @RequestParam String newPassword) {
