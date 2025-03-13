@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/mydb}
-    driver-class-name: ${DB_DRIVER_CLASS_NAME:com.mysql.cj.jdbc.Driver}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:123456}
+    url: ${DB_URL}
+    driver-class-name: ${DB_DRIVER_CLASS_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
@@ -15,7 +15,7 @@ spring:
         format_sql: true
 
 jwt:
-  secret: ${JWT_SECRET:Ymx1ZWtub3Rpc2ZhbGxpbmdpd2FzaG9sZGluZ29uZm9yeW91}
+  secret: ${JWT_SECRET}
 
 mail:
   host: smtp.gmail.com
