@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import me.hakyuwon.ecostep.enums.BadgeType;
-
-import javax.print.attribute.standard.MediaSize;
 import java.util.List;
 
 @Getter

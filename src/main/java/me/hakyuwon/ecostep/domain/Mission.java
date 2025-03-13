@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.hakyuwon.ecostep.enums.MissionType;
 
-import java.math.BigDecimal;
-
 @Entity
 @Getter
 @Setter

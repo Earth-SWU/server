@@ -5,9 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import me.hakyuwon.ecostep.enums.MissionType;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
