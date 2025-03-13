@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.hakyuwon.ecostep.domain.User;
-import me.hakyuwon.ecostep.enums.UserStatus;
 
 @Getter
 @NoArgsConstructor
