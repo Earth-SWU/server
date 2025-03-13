@@ -1,6 +1,7 @@
 package me.hakyuwon.ecostep.enums;
 
 import lombok.Getter;
+import me.hakyuwon.ecostep.domain.Badge;
 
 import java.util.Arrays;
 
@@ -41,4 +42,20 @@ public enum MissionType {
                 throw new IllegalArgumentException("해당 미션에 맞는 뱃지가 존재하지 않습니다.");
         }
     }
+
+    public String getBadgeName(){
+        switch (this) {
+            case ATTENDANCE:
+                return "에코스텝러";
+            case RECEIPT:
+                return "영수증 분석 전문가";
+            case TUMBLER:
+                return "텀블러 마스터";
+            case WALK:
+                return "걷기 챔피언";
+            default:
+                throw new IllegalArgumentException("해당 미션에 맞는 뱃지가 존재하지 않습니다.");
+        }
+    }
+
 }

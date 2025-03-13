@@ -73,16 +73,17 @@ public class MyPageService {
         // user 트리네임 겟, 뱃지 개수, 미션 수행 개수, 나무레벨 겟
         Tree tree = treeRepository.findByUser(user)
                 .orElseThrow(()-> new IllegalArgumentException("유효하지 않은 나무입니다."));
+
         String treeName = tree.getTreeName();
         int badgeCount = userBadgeRepository.countByUser(user);
         int missionCount = userMissionRepository.countByUser(user);
         int treeLevel = tree.getLevel();
 
         return ProfileDto.builder()
-                .treeName(tree.getTreeName())
+                .treeName(treeName)
                 .badgeCount(badgeCount)
                 .missionCount(missionCount)
-                .treeLevel(tree.getLevel())
+                .treeLevel(treeLevel)
                 .build();
     }
 }

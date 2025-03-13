@@ -1,19 +1,16 @@
 package me.hakyuwon.ecostep.service;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.domain.*;
 import me.hakyuwon.ecostep.dto.StepDataDto;
 import me.hakyuwon.ecostep.enums.BadgeType;
 import me.hakyuwon.ecostep.enums.MissionType;
 import me.hakyuwon.ecostep.repository.*;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -122,21 +119,25 @@ public class MissionService {
 
         // 미션 수행 횟수가 조건을 만족하는지 확인
         if (missionCount >= badgeType.getRequiredCount()) {
-            /* 뱃지 중복 인증
+            // 뱃지 중복 인증
+            Badge badge = badgeRepository.findByName(mission.getMissionType().getBadgeName())
+                    .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 뱃지입니다."));
+
             if (userBadgeRepository.existsByUserAndBadge(user, badge)) {
-                return;
-            }*/
-            // 조건을 만족하면 뱃지 부여
-            Badge newBadge = new Badge();
-            newBadge.setBadgeType(badgeType);
-            newBadge.setDescription(badgeType.getName() + "을(를) 달성했습니다!");
+                return ;
+            } else {
+                // 조건을 만족하면 뱃지 부여
+                Badge newBadge = new Badge();
+                newBadge.setBadgeType(badgeType);
+                newBadge.setDescription(badgeType.getName() + "을(를) 달성했습니다!");
 
-            UserBadge userBadge = new UserBadge();
-            userBadge.setUser(user);
-            userBadge.setBadge(newBadge);
-            userBadge.setAwardedAt(LocalDate.now());
+                UserBadge userBadge = new UserBadge();
+                userBadge.setUser(user);
+                userBadge.setBadge(newBadge);
+                userBadge.setAwardedAt(LocalDate.now());
 
-            userBadgeRepository.save(userBadge);
+                userBadgeRepository.save(userBadge);
+            }
         }
     }
 }

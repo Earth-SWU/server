@@ -56,6 +56,7 @@ public class TreeService {
         tree.setGrowth(tree.getGrowth() + growth);
 
         checkLevelUp(tree);// 성장 퍼센트 증가
+        treeRepository.save(tree);
         return new TreeResponseDto(tree);
     }
 

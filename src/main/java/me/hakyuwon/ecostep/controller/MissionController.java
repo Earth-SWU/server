@@ -55,6 +55,8 @@ public class MissionController {
         return ResponseEntity.ok(result);
     }
 
+    // 각 뱃지 지급 api
+
     // 친환경 물품 구매
 
     // 친환경 기사 읽기
