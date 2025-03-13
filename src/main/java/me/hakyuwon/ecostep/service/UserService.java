@@ -90,6 +90,7 @@ public class UserService {
     }
 
     // 회원 탈퇴
+    @Transactional
     public void deleteUser(String email){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다."));
