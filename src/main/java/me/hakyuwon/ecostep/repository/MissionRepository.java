@@ -9,5 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface MissionRepository extends JpaRepository<Mission, Long> {
-    Optional<Mission> findById(Long id);
+    Optional<Mission> findByMissionType(MissionType missionType);
+    boolean existsByMissionType(MissionType missionType);
 }

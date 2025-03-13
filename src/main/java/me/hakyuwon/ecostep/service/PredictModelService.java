@@ -1,5 +1,6 @@
 package me.hakyuwon.ecostep.service;
 
+import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.dto.PredictDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -12,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpHeaders;
 
 @Service
+@RequiredArgsConstructor
 public class PredictModelService {
     @Autowired
     private RestTemplate restTemplate;

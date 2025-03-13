@@ -49,20 +49,16 @@ public class TreeController {
     }
 
     // 물 주기
-    @PostMapping("/api/tree/water")
-    public ResponseEntity<TreeResponseDto> useWater(@AuthenticationPrincipal UserDetails userDetails){
-        Long userId = Long.parseLong(userDetails.getUsername()); // 로그인한 사용자 ID 가져오기
+    @PostMapping("/api/tree/water/{userId}")
+    public ResponseEntity<TreeResponseDto> useWater(@PathVariable Long userId) {
         TreeResponseDto updatedTree = treeService.useWater(userId);
-
         return ResponseEntity.ok(updatedTree);
     }
 
     // 비료 주기
-    @PostMapping("/api/tree/fertilizer")
-    public ResponseEntity<TreeResponseDto> useFertilizer(@AuthenticationPrincipal UserDetails userDetails){
-        Long userId = Long.parseLong(userDetails.getUsername()); // 로그인한 사용자 ID 가져오기
+    @PostMapping("/api/tree/fertilizer/{userId}")
+    public ResponseEntity<TreeResponseDto> useFertilizer(@PathVariable Long userId) {
         TreeResponseDto updatedTree = treeService.useFertilizer(userId);
-
         return ResponseEntity.ok(updatedTree);
     }
 }
