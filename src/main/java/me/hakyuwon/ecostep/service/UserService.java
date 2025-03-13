@@ -112,4 +112,5 @@ public class UserService {
 
         userBadgeRepository.save(userBadge);
     }
+    // 푸시를 위한 주석
 }
