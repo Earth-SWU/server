@@ -4,8 +4,6 @@ spring:
     driver-class-name: ${DB_DRIVER_CLASS_NAME}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-  profiles:
-    active: default
 
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
@@ -15,6 +13,8 @@ spring:
       hibernate:
         show-sql: true
         format_sql: true
+  profiles:
+    active: default
 
 jwt:
   secret: ${JWT_SECRET}
