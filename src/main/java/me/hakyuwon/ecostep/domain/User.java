@@ -34,6 +34,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "reward", nullable = false)
     private Boolean reward = false;
 
+    @Column(name ="username", nullable = false)
     private String username;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
