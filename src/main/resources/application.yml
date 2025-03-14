@@ -1,8 +1,7 @@
 spring:
   datasource:
-    url: jdbc:mysql://54.180.38.63:3306/test?serverTimezone=Asia/Seoul
-    driver-class-name: ${DB_DRIVER_CLASS_NAME}
-    username: ${DB_USERNAME}
+    url: jdbc:mysql://ecostepdb.cruikuqa2yrq.ap-northeast-2.rds.amazonaws.com:3306/
+    username: kyuwon
     password: ${DB_PASSWORD}
 
   jpa:
