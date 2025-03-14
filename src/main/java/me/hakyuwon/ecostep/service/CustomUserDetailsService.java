@@ -1,7 +1,6 @@
 package me.hakyuwon.ecostep.service;
 
 import lombok.RequiredArgsConstructor;
-import me.hakyuwon.ecostep.domain.CustomUserDetails;
 import me.hakyuwon.ecostep.domain.User;
 import me.hakyuwon.ecostep.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,9 +14,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     public final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user =  userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-        return new CustomUserDetails(user);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
     }
 }

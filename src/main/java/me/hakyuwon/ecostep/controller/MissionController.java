@@ -1,12 +1,8 @@
 package me.hakyuwon.ecostep.controller;
 
 import lombok.RequiredArgsConstructor;
-import me.hakyuwon.ecostep.domain.Mission;
-import me.hakyuwon.ecostep.domain.User;
-import me.hakyuwon.ecostep.dto.MissionDto;
 import me.hakyuwon.ecostep.dto.StepDataDto;
 import me.hakyuwon.ecostep.dto.UserMissionDto;
-import me.hakyuwon.ecostep.enums.MissionType;
 import me.hakyuwon.ecostep.repository.MissionRepository;
 import me.hakyuwon.ecostep.repository.UserMissionRepository;
 import me.hakyuwon.ecostep.repository.UserRepository;

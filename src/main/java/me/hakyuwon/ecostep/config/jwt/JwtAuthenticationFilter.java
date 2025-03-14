@@ -47,9 +47,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // "Bearer " 이후의 토큰 값만 추출
         String token = authHeader.substring(7);
-        String email = null;
+        String email = tokenProvider.extractUserEmail(token);
 
-        try {
+        /*try {
             email = tokenProvider.extractUserEmail(token); // JWT에서 email 추출
         } catch (ExpiredJwtException e) {
             // 만료된 토큰 처리 로직
@@ -70,14 +70,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 response.getWriter().write("Token expired and refresh token is invalid or missing.");
                 return;
             }
-        }
+        }*/
 
         // SecurityContext에 인증 정보가 없고, email이 존재하는 경우
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(()-> new UsernameNotFoundException("유효하지 않은 사용자입니다."));
-            String username = user.getUsername();
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+           UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
             if (tokenProvider.validateToken(token, userDetails)) { // 토큰 검증
                 UsernamePasswordAuthenticationToken authentication =
