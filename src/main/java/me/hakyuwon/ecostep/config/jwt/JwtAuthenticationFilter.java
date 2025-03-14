@@ -1,35 +1,32 @@
 package me.hakyuwon.ecostep.config.jwt;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import me.hakyuwon.ecostep.domain.User;
 import me.hakyuwon.ecostep.repository.UserRepository;
-import org.hibernate.service.UnknownServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
     private final UserDetailsService userDetailsService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public JwtAuthenticationFilter(TokenProvider tokenProvider, UserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(TokenProvider tokenProvider, UserDetailsService userDetailsService, UserRepository userRepository) {
         this.tokenProvider = tokenProvider;
         this.userDetailsService = userDetailsService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -72,7 +69,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // SecurityContext에 인증 정보가 없고, email이 존재하는 경우
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-           UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
             if (tokenProvider.validateToken(token, userDetails)) { // 토큰 검증
                 UsernamePasswordAuthenticationToken authentication =

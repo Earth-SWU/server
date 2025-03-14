@@ -9,8 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.enabled;
-
 @Entity
 @Getter
 @Setter
@@ -84,12 +82,13 @@ public class User extends BaseEntity implements UserDetails {
     }
 
     // 인증 사용자의 활성화 상태를 반환
+    @Column(name = "enabled", nullable = false)
+    private Boolean enabled = true; // 기본값은 활성화(true)로 설정
+
+    // ... 나머지 코드
+
     @Override
     public boolean isEnabled() {
-        if (enabled.equals("1")) {
-            return false;
-        } else {
-            return true;
-        }
+        return enabled;
     }
 }
