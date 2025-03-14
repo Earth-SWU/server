@@ -35,6 +35,11 @@ public class UserController {
     private final MailService mailService;
     private final UserRepository userRepository;
 
+    @GetMapping("/")
+    public String home() {
+        return "home";
+    }
+
     // 회원가입
     @PostMapping("/api/users/signup")
     public ResponseEntity<UserDto.UserSignupResponseDto> signup(@RequestBody UserSignUpRequest request){
