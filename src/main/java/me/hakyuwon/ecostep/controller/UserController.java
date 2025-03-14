@@ -37,7 +37,7 @@ public class UserController {
 
     @GetMapping("/")
     public String home() {
-        return "home";
+        return "home page";
     }
 
     // 회원가입
