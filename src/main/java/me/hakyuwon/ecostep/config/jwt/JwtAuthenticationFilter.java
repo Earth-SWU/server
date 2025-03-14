@@ -25,13 +25,11 @@ import java.util.Optional;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
     private final UserDetailsService userDetailsService;
-    private final UserRepository userRepository;
 
     @Autowired
-    public JwtAuthenticationFilter(TokenProvider tokenProvider, UserDetailsService userDetailsService, UserRepository userRepository) {
+    public JwtAuthenticationFilter(TokenProvider tokenProvider, UserDetailsService userDetailsService) {
         this.tokenProvider = tokenProvider;
         this.userDetailsService = userDetailsService;
-        this.userRepository = userRepository;
     }
 
     @Override
