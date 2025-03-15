@@ -13,6 +13,7 @@ spring:
       hibernate:
         show-sql: true
         format_sql: true
+
   profiles:
     active: default
 
@@ -35,3 +36,7 @@ mail:
         timeout: 5000
         writetimeout: 5000
   auth-code-expiration-millis: 1800000
+
+logging:
+  level:
+    org.hibernate: DEBUG

@@ -18,6 +18,7 @@ public class Badge {
     @Enumerated(EnumType.STRING)
     private BadgeType badgeType;
 
+
     private String name;
     private String description;
 

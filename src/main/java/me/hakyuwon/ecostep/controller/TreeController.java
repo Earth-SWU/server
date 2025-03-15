@@ -7,6 +7,7 @@ import me.hakyuwon.ecostep.dto.TreeResponseDto;
 import me.hakyuwon.ecostep.repository.UserRepository;
 import me.hakyuwon.ecostep.service.TreeService;
 import me.hakyuwon.ecostep.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +21,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 public class TreeController {
+    @Autowired
     private final TreeService treeService;
     private final UserRepository userRepository;
 

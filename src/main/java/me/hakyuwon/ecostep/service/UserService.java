@@ -8,7 +8,6 @@ import me.hakyuwon.ecostep.domain.UserBadge;
 import me.hakyuwon.ecostep.dto.UserDto;
 import me.hakyuwon.ecostep.dto.UserLoginRequest;
 import me.hakyuwon.ecostep.dto.UserSignUpRequest;
-import me.hakyuwon.ecostep.enums.BadgeType;
 import me.hakyuwon.ecostep.repository.BadgeRepository;
 import me.hakyuwon.ecostep.repository.TreeRepository;
 import me.hakyuwon.ecostep.repository.UserBadgeRepository;
@@ -37,7 +36,6 @@ public class UserService {
     }
 
     // user 엔티티 객체 생성, 저장 (회원가입)
-    @Transactional
     public UserDto.UserSignupResponseDto signUp(UserSignUpRequest userDto) {
         // 이메일 중복 검증
         if (userRepository.existsByEmail(userDto.getEmail())){
@@ -63,6 +61,7 @@ public class UserService {
 
         newUser.setTree(tree);
         userRepository.save(newUser);
+        treeRepository.save(tree);
 
         return UserDto.UserSignupResponseDto.builder()
                 .userId(newUser.getId())

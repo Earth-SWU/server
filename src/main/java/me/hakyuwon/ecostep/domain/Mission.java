@@ -25,12 +25,12 @@ public class Mission {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(nullable = false)
+    @Column(name = "carbonReduction", nullable = false)
     private double carbonReduction;
 
-    @Column(nullable = false)
+    @Column(name ="mission_water",nullable = false)
     private int mission_water;
 
-    @Column(nullable = false)
+    @Column(name ="mission_fert",nullable = false)
     private int mission_fert;
 }

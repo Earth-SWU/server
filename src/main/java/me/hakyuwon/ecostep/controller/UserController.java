@@ -13,6 +13,7 @@ import me.hakyuwon.ecostep.repository.UserRepository;
 import me.hakyuwon.ecostep.service.MailService;
 import me.hakyuwon.ecostep.service.TreeService;
 import me.hakyuwon.ecostep.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -29,6 +30,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Controller
 public class UserController {
+
+    @Autowired
     private final UserService userService;
     private final TreeService treeService;
     private final TokenProvider tokenProvider;

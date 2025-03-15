@@ -7,6 +7,7 @@ import me.hakyuwon.ecostep.repository.MissionRepository;
 import me.hakyuwon.ecostep.repository.UserMissionRepository;
 import me.hakyuwon.ecostep.repository.UserRepository;
 import me.hakyuwon.ecostep.service.MissionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 @Controller
 @RequestMapping("/api/missions")
 public class MissionController {
+    @Autowired
     private final MissionService missionService;
     private final UserMissionRepository userMissionRepository;
     private final UserRepository userRepository;

@@ -8,6 +8,7 @@ import me.hakyuwon.ecostep.dto.ProfileDto;
 import me.hakyuwon.ecostep.service.BadgeService;
 import me.hakyuwon.ecostep.service.MyPageService;
 import me.hakyuwon.ecostep.service.PredictModelService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Controller
 public class MyPageController {
+    @Autowired
     private final MyPageService myPageService;
     private final BadgeService badgeService;
     private final PredictModelService predictModelService;
