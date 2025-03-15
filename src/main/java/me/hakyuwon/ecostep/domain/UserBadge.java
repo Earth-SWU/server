@@ -20,6 +20,7 @@ public class UserBadge {
     private User user; // 유저
 
     @ManyToOne
+    @JoinColumn(name = "badge_id")
     private Badge badge; // 부여된 뱃지
 
     private LocalDate awardedAt; // 뱃지 부여 일자

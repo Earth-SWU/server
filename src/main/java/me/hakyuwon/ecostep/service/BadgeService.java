@@ -28,7 +28,7 @@ public class BadgeService {
         User user = userRepository.findById(userId).orElse(null);
 
         // 사용자가 획득한 뱃지 목록을 한 번에 조회
-        List<Badge> acquiredBadges = userBadgeRepository.findBadgesByUser(userId);
+        List<Badge> acquiredBadges = userBadgeRepository.findBadgesByUser(user);
         Set<Long> acquiredBadgeIds = acquiredBadges.stream()
                 .map(Badge::getId)
                 .collect(Collectors.toSet());
