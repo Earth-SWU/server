@@ -44,7 +44,6 @@ public class UserController {
     @PostMapping("/api/users/signup")
     public ResponseEntity<UserDto.UserSignupResponseDto> signup(@RequestBody UserSignUpRequest request){
         UserDto.UserSignupResponseDto signupResponse = userService.signUp(request);
-        // 회원가입 후 로그인 페이지로
         return ResponseEntity.ok().body(signupResponse);
     }
 
