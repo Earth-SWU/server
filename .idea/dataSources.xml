@@ -13,11 +13,11 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="@ecostepdb.cruikuqa2yrq.ap-northeast-2.rds.amazonaws.com" uuid="34c91039-3c6e-473a-980a-d68a4e21305c">
+    <data-source source="LOCAL" name="demo" uuid="943010fb-e849-456f-8091-ab431cd909d2">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://ecostepdb.cruikuqa2yrq.ap-northeast-2.rds.amazonaws.com:3306/</jdbc-url>
+      <jdbc-url>jdbc:mysql://database-demo.cruikuqa2yrq.ap-northeast-2.rds.amazonaws.com:3306/demo</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />

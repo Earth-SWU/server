@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://ecostepdb.cruikuqa2yrq.ap-northeast-2.rds.amazonaws.com:3306/ecostep?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://database-demo.cruikuqa2yrq.ap-northeast-2.rds.amazonaws.com:3306/demo?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: kyuwon
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -8,7 +8,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         show-sql: true
