@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
+@Table(name="tree")
 public class Tree extends BaseEntity {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
