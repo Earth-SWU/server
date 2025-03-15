@@ -1,8 +1,9 @@
 spring:
   datasource:
-    url: jdbc:mysql://ecostepdb.cruikuqa2yrq.ap-northeast-2.rds.amazonaws.com:3306/ecostep?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://ecostepdb.cruikuqa2yrq.ap-northeast-2.rds.amazonaws.com:3306/ecostepdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: kyuwon
     password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
