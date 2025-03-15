@@ -36,6 +36,7 @@ public class UserService {
     }
 
     // user 엔티티 객체 생성, 저장 (회원가입)
+    @Transactional
     public UserDto.UserSignupResponseDto signUp(UserSignUpRequest userDto) {
         // 이메일 중복 검증
         if (userRepository.existsByEmail(userDto.getEmail())){
