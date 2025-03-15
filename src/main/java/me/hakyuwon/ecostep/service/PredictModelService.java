@@ -24,7 +24,7 @@ public class PredictModelService {
         this.restTemplate = restTemplateBuilder.build();
     }
 
-    public String callPredictAPI(String inputData) {
+    public PredictDto.PredictResponse callPredictAPI(String inputData) {
         // 요청 객체 설정
         try {
         PredictDto.PredictRequest request = new PredictDto.PredictRequest();
@@ -41,7 +41,7 @@ public class PredictModelService {
                 FASTAPI_URL, HttpMethod.POST, entity, PredictDto.PredictResponse.class);
 
         // 응답 데이터 반환
-        return responseEntity.getBody().getPrediction();
+        return responseEntity.getBody();
     } catch (
     RestClientException e) {
         // 예외 발생 시 로깅 후 적절한 응답 반환
