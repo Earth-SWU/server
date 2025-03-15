@@ -12,7 +12,6 @@ import me.hakyuwon.ecostep.enums.MissionType;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Mission")
 public class Mission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
