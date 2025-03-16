@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@Transactional
 public class UserService {
     private final UserRepository userRepository;
     private final TreeRepository treeRepository;
@@ -36,7 +37,6 @@ public class UserService {
     }
 
     // user 엔티티 객체 생성, 저장 (회원가입)
-    @Transactional
     public UserDto.UserSignupResponseDto signUp(UserSignUpRequest userDto) {
         // 이메일 중복 검증
         if (userRepository.existsByEmail(userDto.getEmail())){
@@ -61,8 +61,8 @@ public class UserService {
         tree.setFertilizer(0);
 
         newUser.setTree(tree);
-        userRepository.save(newUser);
         treeRepository.save(tree);
+        userRepository.save(newUser);
 
         return UserDto.UserSignupResponseDto.builder()
                 .userId(newUser.getId())
@@ -71,7 +71,6 @@ public class UserService {
     }
 
     // 로그인
-    @Transactional
     public UserDto.UserLoginResponseDto logIn(UserLoginRequest userDto){
         User user = userRepository.findByEmail(userDto.getEmail())
                 .orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다."));
@@ -90,7 +89,6 @@ public class UserService {
     }
 
     // 회원 탈퇴
-    @Transactional
     public void deleteUser(String email){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다."));
@@ -99,7 +97,6 @@ public class UserService {
     }
 
     // 회원가입 후 뱃지 획득
-    @Transactional
     public void firstBadge(Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
