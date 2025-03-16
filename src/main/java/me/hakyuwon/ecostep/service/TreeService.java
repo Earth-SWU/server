@@ -26,6 +26,7 @@ public class TreeService {
 
         tree.setTreeName(name);
         treeRepository.save(tree);
+        user.setTree(tree);
 
         return new TreeResponseDto(tree);
     }

@@ -26,26 +26,9 @@ public class TreeController {
     private final UserRepository userRepository;
 
     // 나무 이름 짓기
-    @PutMapping("/api/tree/name")
-    public ResponseEntity<TreeResponseDto> name(@AuthenticationPrincipal UserDetails userDetails, @RequestBody TreeDto.TreeRequestDto requestDto) {
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);  // 인증되지 않은 사용자 처리
-        }
-        String email = userDetails.getUsername(); // 이메일 주소를 가져오기
-
-        // userRepository에서 사용자 찾기
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        // 사용자 존재 여부 확인 (Optional이기 때문에)
-        if (!optionalUser.isPresent()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);  // 이메일로 사용자 찾을 수 없을 경우 처리
-        }
-
-        // 사용자 ID 가져오기
-        User user = optionalUser.get();
-        Long userId = user.getId();
-        String treeName = requestDto.getTreeName(); // requestBody에서 treeName 가져오기
-
+    @PutMapping("/api/tree/name/{userId}")
+    public ResponseEntity<TreeResponseDto> name(@PathVariable Long userId, @RequestBody TreeDto.TreeRequestDto requestDto) {
+        String treeName = requestDto.getTreeName();
         TreeResponseDto updatedTree = treeService.setTreeName(userId, treeName);
         return ResponseEntity.ok(updatedTree);
     }
