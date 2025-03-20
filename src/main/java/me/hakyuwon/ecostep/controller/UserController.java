@@ -70,7 +70,7 @@ public class UserController {
 
     // 메인 화면
     @GetMapping("/api/home/{userId}")
-    public ResponseEntity<TreeResponseDto> getHome(@RequestParam Long userId){
+    public ResponseEntity<TreeResponseDto> getHome(@PathVariable Long userId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         String email;
