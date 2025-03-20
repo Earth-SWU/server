@@ -59,11 +59,19 @@ public class MailService {
             mailSender.send(message); // 메일 발송
         } catch (MailException e) {
             e.printStackTrace();
-            throw new IllegalArgumentException("메일 발송 중 오류가 발생했습니다.");
+            throw new IllegalStateException("메일 발송 중 오류가 발생했습니다.");
         }
         // 인증번호 저장
         verificationCodes.put(sendEmail, number);
-        redisUtil.setDataExpire(number, sendEmail, 60*5L);
+        try {
+            // Redis에 인증번호 저장
+            redisUtil.setDataExpire(number, sendEmail, 60 * 5L);
+        } catch (Exception e) {
+            // Redis 오류
+            System.err.println("Redis 오류: " + e.getMessage());
+            e.printStackTrace();
+            throw new IllegalStateException("Redis에 인증번호 저장 중 오류가 발생했습니다.");
+        }
 
         return number;
     }
