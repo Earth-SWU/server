@@ -72,18 +72,31 @@ public class UserController {
     }
 
     // 메인 화면
-    @GetMapping("/api/home")
-    public ResponseEntity<TreeResponseDto> getHome(){
+    @GetMapping("/api/home/{userId}")
+    public ResponseEntity<TreeResponseDto> getHome(@RequestParam Long userId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = ((UserDetails) authentication.getPrincipal()).getUsername();
+
+        String email;
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof String) {
+            email = (String) principal;
+        } else {
+            throw new IllegalStateException("인증 정보가 올바르지 않습니다.");
+        }
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        Long userId = user.getId();
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        // 요청된 userId와 인증된 userId가 일치하는지 검증
+        if (!user.getId().equals(userId)) {
+            throw new SecurityException("잘못된 접근입니다.");
+        }
 
         // 트리 정보 가져오기
         TreeResponseDto treeInfo = treeService.getTreeInfo(userId);
-
         return ResponseEntity.ok(treeInfo);
     }
 
