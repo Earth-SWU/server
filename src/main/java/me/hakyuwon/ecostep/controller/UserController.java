@@ -5,10 +5,7 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.config.jwt.TokenProvider;
 import me.hakyuwon.ecostep.domain.User;
-import me.hakyuwon.ecostep.dto.TreeResponseDto;
-import me.hakyuwon.ecostep.dto.UserDto;
-import me.hakyuwon.ecostep.dto.UserLoginRequest;
-import me.hakyuwon.ecostep.dto.UserSignUpRequest;
+import me.hakyuwon.ecostep.dto.*;
 import me.hakyuwon.ecostep.repository.UserRepository;
 import me.hakyuwon.ecostep.service.MailService;
 import me.hakyuwon.ecostep.service.TreeService;
@@ -103,9 +100,9 @@ public class UserController {
     // 인증 메일 전송
     @ResponseBody
     @PostMapping("/api/email-check")
-    public ResponseEntity<String> emailCheck(@RequestParam String email) throws MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<String> emailCheck(@RequestBody EmailDto.EmailRequestDto dto) throws MessagingException, UnsupportedEncodingException {
         try {
-            mailService.sendSimpleMessage(email);
+            mailService.sendSimpleMessage(dto);
             return ResponseEntity.ok("인증번호가 발송되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("메일 발송 실패");
@@ -114,8 +111,8 @@ public class UserController {
 
     // 인증 번호 확인
     @PostMapping("/api/verify-code")
-    public ResponseEntity<String> verifyCode(@RequestParam String email, @RequestParam String code) throws MessagingException, UnsupportedEncodingException {
-        if (mailService.verifyCode(email, code)) {
+    public ResponseEntity<String> verifyCode(@RequestBody EmailDto.VerifyCodeRequestDto dto) throws MessagingException, UnsupportedEncodingException {
+        if (mailService.verifyCode(dto)) {
             return ResponseEntity.ok("인증 성공");
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 실패");

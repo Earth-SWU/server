@@ -3,6 +3,7 @@ package me.hakyuwon.ecostep.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import me.hakyuwon.ecostep.dto.EmailDto;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -50,8 +51,10 @@ public class MailService {
     }
 
     // 메일 발송
-    public String sendSimpleMessage(String sendEmail) throws MessagingException {
+    public String sendSimpleMessage(EmailDto.EmailRequestDto dto) throws MessagingException {
+        String sendEmail = dto.getEmail();
         String number = createNumber(); // 랜덤 인증번호 생성
+
         MimeMessage message = createMail(sendEmail, number); // 메일 생성
         try {
             mailSender.send(message); // 메일 발송
@@ -78,7 +81,10 @@ public class MailService {
         return number;
     }
 
-    public boolean verifyCode(String email, String inputCode) {
+    public boolean verifyCode(EmailDto.VerifyCodeRequestDto dto) {
+        String email = dto.getEmail();
+        String inputCode = dto.getCode();
+
         String storedCode = verificationCodes.get(email);
         if (storedCode != null && storedCode.equals(inputCode)) {
             verificationCodes.remove(email); // 인증번호 사용 후 삭제
