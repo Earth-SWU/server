@@ -4,6 +4,8 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.dto.EmailDto;
+import me.hakyuwon.ecostep.util.RedisUtil;
+import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -20,14 +22,10 @@ import java.util.concurrent.ScheduledFuture;
 public class MailService {
     private final JavaMailSender mailSender;
     private static final String senderEmail = "weecostep@gmail.com";
-    // 인증번호 유효 시간 (5분)
-    private static final long EXPIRATION_TIME = Duration.ofMinutes(5).toMillis();
 
     // 인증번호 저장을 위한 Map
     private final Map<String, String> verificationCodes = new ConcurrentHashMap<>();
-    private final Map<String, ScheduledFuture<?>> expirationTasks = new ConcurrentHashMap<>();
-
-    private final ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+    private final RedisUtil redisUtil;
 
     // 랜덤으로 숫자 생성
     public String createNumber() {
@@ -56,8 +54,8 @@ public class MailService {
         String sendEmail = dto.getEmail();
         String number = createNumber(); // 랜덤 인증번호 생성
 
-        MimeMessage message = createMail(sendEmail, number); // 메일 생성
         try {
+            MimeMessage message = createMail(sendEmail, number); // 메일 생성
             mailSender.send(message); // 메일 발송
         } catch (MailException e) {
             e.printStackTrace();
@@ -65,19 +63,7 @@ public class MailService {
         }
         // 인증번호 저장
         verificationCodes.put(sendEmail, number);
-
-        // 일정 시간이 지나면 인증번호 삭제
-        ScheduledFuture<?> scheduledTask = taskScheduler.schedule(
-                () -> verificationCodes.remove(sendEmail),
-                new java.util.Date(System.currentTimeMillis() + EXPIRATION_TIME)
-        );
-        expirationTasks.put(sendEmail, scheduledTask);
-
-        // 기존 만료 작업이 있다면 취소
-        ScheduledFuture<?> existingTask = expirationTasks.get(sendEmail);
-        if (existingTask != null) {
-            existingTask.cancel(false);
-        }
+        redisUtil.setDataExpire(number, sendEmail, 60*5L);
 
         return number;
     }
