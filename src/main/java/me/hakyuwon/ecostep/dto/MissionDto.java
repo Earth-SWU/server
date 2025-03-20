@@ -14,5 +14,4 @@ public class MissionDto {
     private String description;
     private double carbonReduction;
     private int missionWater;
-    private int missionFert;
 }
