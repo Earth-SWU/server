@@ -100,7 +100,7 @@ public class UserController {
     // 인증 메일 전송
     @ResponseBody
     @PostMapping("/api/email-check")
-    public ResponseEntity<String> emailCheck(@RequestBody EmailDto.EmailRequestDto dto) throws MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<String> emailCheck(@RequestBody EmailDto.EmailRequestDto dto) {
         try {
             mailService.sendSimpleMessage(dto);
             return ResponseEntity.ok("인증번호가 발송되었습니다.");
@@ -111,7 +111,7 @@ public class UserController {
 
     // 인증 번호 확인
     @PostMapping("/api/verify-code")
-    public ResponseEntity<String> verifyCode(@RequestBody EmailDto.VerifyCodeRequestDto dto) throws MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<String> verifyCode(@RequestBody EmailDto.VerifyCodeRequestDto dto) {
         if (mailService.verifyCode(dto)) {
             return ResponseEntity.ok("인증 성공");
         } else {
