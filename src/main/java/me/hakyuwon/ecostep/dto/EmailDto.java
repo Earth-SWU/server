@@ -10,13 +10,13 @@ import lombok.Setter;
 public class EmailDto {
     @Getter
     @Setter
-    public class EmailRequestDto {
+    public static class EmailRequestDto {
         private String email;
     }
 
     @Getter
     @Setter
-    public class VerifyCodeRequestDto {
+    public static class VerifyCodeRequestDto {
         private String email;
         private String code;
     }
