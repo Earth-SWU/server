@@ -18,13 +18,10 @@ public class Badge {
     @Enumerated(EnumType.STRING)
     private BadgeType badgeType;
 
-
     private String name;
     private String description;
 
     @Column(nullable = true)
     private Integer requiredCount;
 
-    @ManyToMany
-    private List<Mission> missions;
 }
