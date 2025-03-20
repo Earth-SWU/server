@@ -98,7 +98,6 @@ public class UserController {
     }
 
     // 인증 메일 전송
-    @ResponseBody
     @PostMapping("/api/email-check")
     public ResponseEntity<String> emailCheck(@RequestBody EmailDto.EmailRequestDto dto) {
         try {

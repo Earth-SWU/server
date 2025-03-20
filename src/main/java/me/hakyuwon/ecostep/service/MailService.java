@@ -45,6 +45,7 @@ public class MailService {
         String body = "";
         body += "<h3>요청하신 인증 번호입니다.</h3>";
         body += "<h1>" + number + "</h1>";
+        body += "<h3>5분 안에 인증 번호를 입력해 주세요.</h3>";
         message.setText(body, "UTF-8", "html");
 
         return message;
@@ -65,18 +66,18 @@ public class MailService {
         // 인증번호 저장
         verificationCodes.put(sendEmail, number);
 
-        // 기존 만료 작업이 있다면 취소
-        ScheduledFuture<?> existingTask = expirationTasks.get(sendEmail);
-        if (existingTask != null) {
-            existingTask.cancel(false);
-        }
-
         // 일정 시간이 지나면 인증번호 삭제
         ScheduledFuture<?> scheduledTask = taskScheduler.schedule(
                 () -> verificationCodes.remove(sendEmail),
                 new java.util.Date(System.currentTimeMillis() + EXPIRATION_TIME)
         );
         expirationTasks.put(sendEmail, scheduledTask);
+
+        // 기존 만료 작업이 있다면 취소
+        ScheduledFuture<?> existingTask = expirationTasks.get(sendEmail);
+        if (existingTask != null) {
+            existingTask.cancel(false);
+        }
 
         return number;
     }
