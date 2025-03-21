@@ -1,7 +1,6 @@
 package me.hakyuwon.ecostep.controller;
 
 import io.jsonwebtoken.Claims;
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.config.jwt.TokenProvider;
 import me.hakyuwon.ecostep.domain.User;
@@ -13,13 +12,9 @@ import me.hakyuwon.ecostep.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
