@@ -79,9 +79,9 @@ public class UserController {
         String email = claims.getSubject();
 
         User user1 = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다. 1"));
         User user2 = userRepository.findByEmail(email)
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다. 2"));
 
         // 요청된 userId와 인증된 userId가 일치하는지 검증
         if (!user1.getId().equals(user2.getId())) {
