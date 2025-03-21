@@ -16,6 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 
 @Service
 @Transactional
@@ -107,6 +109,7 @@ public class UserService {
         UserBadge userBadge = new UserBadge();
         userBadge.setUser(user);
         userBadge.setBadge(badge);
+        userBadge.setAwardedAt(LocalDate.now());
 
         userBadgeRepository.save(userBadge);
     }
