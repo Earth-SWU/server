@@ -32,8 +32,8 @@ public class MissionController {
     }
 
     // 출석 체크 미션
-    @GetMapping("/attend")
-    public ResponseEntity<String> getAttendanceStatus(@RequestParam Long userId) {
+    @GetMapping("/attend/{userId}")
+    public ResponseEntity<String> getAttendanceStatus(@PathVariable Long userId) {
         String result = missionService.checkAttendance(userId);
         return ResponseEntity.ok(result);
     }

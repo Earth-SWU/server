@@ -70,31 +70,29 @@ public class UserController {
 
     // 메인 화면
     @GetMapping("/api/home/{userId}")
-    public ResponseEntity<TreeResponseDto> getHome(@PathVariable Long userId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String email;
-        Object principal = authentication.getPrincipal();
-
-        if (principal instanceof UserDetails) {
-            email = ((UserDetails) principal).getUsername();
-        } else if (principal instanceof String) {
-            email = (String) principal;
-        } else {
-            throw new IllegalStateException("인증 정보가 올바르지 않습니다.");
+    public ResponseEntity<TreeResponseDto> getHome(@PathVariable Long userId, @RequestHeader("Authorization") String token){
+        try{
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
         }
+        Claims claims = tokenProvider.getClaims(token); // 토큰에서 payload 추출
+        String email = claims.getSubject();
 
-        User user = userRepository.findByEmail(email)
+        User user1 = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        User user2 = userRepository.findByEmail(email)
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         // 요청된 userId와 인증된 userId가 일치하는지 검증
-        if (!user.getId().equals(userId)) {
+        if (!user1.getId().equals(user2.getId())) {
             throw new SecurityException("잘못된 접근입니다.");
         }
-
         // 트리 정보 가져오기
         TreeResponseDto treeInfo = treeService.getTreeInfo(userId);
-        return ResponseEntity.ok(treeInfo);
+        return ResponseEntity.ok(treeInfo);}
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
     }
 
     // 인증 메일 전송
