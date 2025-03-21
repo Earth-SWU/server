@@ -4,7 +4,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.dto.EmailDto;
-import me.hakyuwon.ecostep.util.RedisUtil;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,6 @@ public class MailService {
 
     // 인증번호 저장을 위한 Map
     private final Map<String, String> verificationCodes = new ConcurrentHashMap<>();
-    private final RedisUtil redisUtil;
 
     // 랜덤으로 숫자 생성
     public String createNumber() {
@@ -55,20 +53,10 @@ public class MailService {
             mailSender.send(message); // 메일 발송
         } catch (MailException e) {
             e.printStackTrace();
-            throw new IllegalStateException("메일 발송 중 오류가 발생했습니다.");
+            throw new IllegalArgumentException("메일 발송 중 오류가 발생했습니다.");
         }
         // 인증번호 저장
         verificationCodes.put(sendEmail, number);
-        try {
-            // Redis에 인증번호 저장
-            redisUtil.setDataExpire(number, sendEmail, 60 * 5L);
-        } catch (Exception e) {
-            // Redis 오류
-            System.err.println("Redis 오류: " + e.getMessage());
-            e.printStackTrace();
-            throw new IllegalStateException("Redis에 인증번호 저장 중 오류가 발생했습니다.");
-        }
-
         return number;
     }
 
