@@ -24,6 +24,7 @@ public class UserDto {
     @Builder
     @Getter
     public static class UserLoginResponseDto {
+        private Long userId;
         private String email;
         private String accessToken;
         private String refreshToken;

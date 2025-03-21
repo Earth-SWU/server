@@ -84,6 +84,7 @@ public class UserService {
         String refreshToken = tokenProvider.createRefreshToken(user.getEmail());
 
         return UserDto.UserLoginResponseDto.builder()
+                .userId(user.getId())
                 .email(user.getEmail())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
