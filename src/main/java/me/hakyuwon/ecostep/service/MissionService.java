@@ -29,7 +29,7 @@ public class MissionService {
     private static final Set<Long> FERTILIZER_MISSION_IDS = Set.of(5L);
     private final BadgeRepository badgeRepository;
 
-
+    // 미션 완료
     @Transactional
     public String completeMission(Long userId, Long missionId) {
         User user = userRepository.findById(userId)
@@ -67,6 +67,7 @@ public class MissionService {
         return "미션 완료!";
     }
 
+    // 출석 체크
     @Transactional
     public String checkAttendance(Long userId) {
         User user = userRepository.findById(userId)
@@ -85,7 +86,7 @@ public class MissionService {
 
     @Transactional
     public String checkSteps(StepDataDto stepDataDto) {
-        User user = userRepository.findById(stepDataDto.getId())
+        User user = userRepository.findById(stepDataDto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
         Mission mission = missionRepository.findByMissionType(MissionType.WALK)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 미션입니다."));

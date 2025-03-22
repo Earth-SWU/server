@@ -33,7 +33,7 @@ public class MyPageService {
         String treeName = tree.getTreeName();
         int badgeCount = userBadgeRepository.countByUser(user);
         int missionCount = userMissionRepository.countByUser(user);
-        int treeLevel = tree.getLevel();
+        int treeLevel = tree.getTreeLevel();
 
         ProfileDto profile = new ProfileDto(treeName, badgeCount, missionCount, treeLevel);
 
@@ -77,7 +77,7 @@ public class MyPageService {
         String treeName = tree.getTreeName();
         int badgeCount = userBadgeRepository.countByUser(user);
         int missionCount = userMissionRepository.countByUser(user);
-        int treeLevel = tree.getLevel();
+        int treeLevel = tree.getTreeLevel();
 
         return ProfileDto.builder()
                 .treeName(treeName)

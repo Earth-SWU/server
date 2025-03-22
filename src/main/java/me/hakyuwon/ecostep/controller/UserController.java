@@ -49,6 +49,8 @@ public class UserController {
         return ResponseEntity.ok().body(loginResponse);
     }
 
+
+
     // 회원 탈퇴
     @DeleteMapping("/api/users/delete")
     public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token) {

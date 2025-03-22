@@ -54,13 +54,14 @@ public class TreeService {
         int growth = 15;
 
         tree.setWater(tree.getWater() - water); // 물 1개 차감
-        tree.setGrowth(tree.getGrowth() + growth);
+        tree.setTreeGrowth(tree.getTreeGrowth() + growth);
 
         checkLevelUp(tree);// 성장 퍼센트 증가
         treeRepository.save(tree);
         return new TreeResponseDto(tree);
     }
 
+    /*
     // 비료 주기
     public TreeResponseDto useFertilizer(Long userId){
         User user = userRepository.findById(userId)
@@ -77,21 +78,20 @@ public class TreeService {
         checkLevelUp(tree);
 
         return new TreeResponseDto(tree);
-    }
-
+    }*/
 
     private void checkLevelUp(Tree tree) {
-        while (tree.getGrowth() >= 100) {
+        while (tree.getTreeGrowth() >= 100) {
             levelUp(tree);
         }
     }
 
     private void levelUp(Tree tree) {
-        if (tree.getLevel() < 4) {  // 최대 레벨 4
-            tree.setLevel(tree.getLevel() + 1);  // 레벨 업
-            tree.setGrowth(tree.getGrowth() - 100);
+        if (tree.getTreeLevel() < 4) {  // 최대 레벨 4
+            tree.setTreeLevel(tree.getTreeLevel() + 1);  // 레벨 업
+            tree.setTreeGrowth(tree.getTreeGrowth() - 100);
         } else {
-            tree.setGrowth(100); // 끝
+            tree.setTreeGrowth(100); // 끝
         }
     }
 }

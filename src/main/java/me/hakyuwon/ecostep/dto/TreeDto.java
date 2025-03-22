@@ -8,7 +8,6 @@ public class TreeDto {
     private int level;
     private int growth;
     private int water;
-    private int fertilizer;
 
     @Builder
     @Getter

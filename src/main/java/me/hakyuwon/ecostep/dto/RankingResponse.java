@@ -5,9 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-public class StepDataDto {
+@AllArgsConstructor
+public class RankingResponse {
+    private int rank;
     private Long userId;
-    private int steps;
+    private int treeLevel;
+    private double growth;
 }
