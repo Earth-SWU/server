@@ -59,7 +59,6 @@ public class MissionService {
                         completedMissionIds.contains(mission.getId()) // 달성 여부
                 ))
                 .collect(Collectors.toList());
-
     }
 
     // 미션 완료
