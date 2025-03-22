@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,6 +28,7 @@ public class MyPageService {
     public MyPageDto getMyPage(@PathVariable Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
+
         // user 트리네임 겟, 뱃지 개수, 미션 수행 개수, 나무레벨 겟
         Tree tree = treeRepository.findByUser(user)
                 .orElseThrow(()-> new IllegalArgumentException("유효하지 않은 나무입니다."));
@@ -37,33 +39,61 @@ public class MyPageService {
 
         ProfileDto profile = new ProfileDto(treeName, badgeCount, missionCount, treeLevel);
 
-        // 2. 탄소 감축량 통계 조회
+        // 탄소 감축량 통계 조회
         List<UserMission> userMissions = userMissionRepository.findByUser(user);
         double totalReduction = userMissions.stream()
                 .mapToDouble(UserMission::getCarbonReduction)
                 .sum();
         CarbonStatsDto carbonStats = new CarbonStatsDto(userId, totalReduction);
 
-        // 3. 이번 달 미션 달성률 조회
+        // 이번 달 미션 달성률 조회
         LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
         LocalDateTime startOfMonth = firstDayOfMonth.atStartOfDay();
 
         List<UserMission> eachMissions = userMissionRepository.findByUserAndCompletedAtAfter(user, startOfMonth);
         long totalMissions = eachMissions.size();
+
         // 미션 타입과 각각의 횟수가 저장됨
         Map<String, Long> missionCounts = eachMissions.stream()
                 .collect(Collectors.groupingBy(um -> String.valueOf(um.getMission().getMissionType()), Collectors.counting()));
 
-        // 4. 미션별 퍼센트 계산
-        Map<String, Double> missionPercentages = missionCounts.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> (totalMissions > 0) ? (entry.getValue() * 100.0 / totalMissions) : 0.0
-                ));
+        Map<String, Double> missionPercentages = new HashMap<>();
 
-        MissionProgressDto missionProgress = new MissionProgressDto(userId, totalMissions, missionPercentages.size());
+        if (totalMissions > 0) {
+            double sumPercentage = 0.0;
+            String maxKey = null;
+            double maxPercentage = 0.0;
 
-        // 4. 통합 DTO 생성
+            // 각 미션의 원래 퍼센트 계산
+            for (Map.Entry<String, Long> entry : missionCounts.entrySet()) {
+                double percentage = entry.getValue() * 100.0 / totalMissions;
+                missionPercentages.put(entry.getKey(), percentage);
+                sumPercentage += percentage;
+
+                // 가장 큰 퍼센트를 가진 미션 찾기
+                if (percentage > maxPercentage) {
+                    maxPercentage = percentage;
+                    maxKey = entry.getKey();
+                }
+            }
+
+            // 소수점 오차 보정: 총합이 100이 아닐 경우, 가장 큰 비율의 미션에 차이를 더함
+            double diff = 100.0 - sumPercentage;
+            if (maxKey != null) {
+                missionPercentages.put(maxKey, missionPercentages.get(maxKey) + diff);
+            }
+        } else {
+            // 미션을 하나도 수행하지 않았을 경우 모든 타입에 대해 0%로 처리
+            missionCounts.keySet().forEach(key -> missionPercentages.put(key, 0.0));
+        }
+
+        MissionProgressDto missionProgress = new MissionProgressDto(
+                userId,
+                totalMissions,
+                missionPercentages.size(), // 이 값은 미션 타입의 개수를 나타냅니다.
+                missionPercentages
+        );
+
         return new MyPageDto(profile, carbonStats, missionProgress);
     }
 

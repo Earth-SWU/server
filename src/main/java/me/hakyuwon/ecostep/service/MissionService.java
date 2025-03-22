@@ -43,6 +43,7 @@ public class MissionService {
 
         // 오늘 날짜의 시작 시간 (00:00)
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        double carbonReduction = mission.getCarbonReduction();
 
         // 오늘 해당 미션을 이미 완료했는지 확인
         if (userMissionRepository.existsByUserAndMissionAndCompletedAtAfter(user, mission, startOfDay)) {
@@ -52,6 +53,7 @@ public class MissionService {
         UserMission userMission = UserMission.builder()
                 .user(user)
                 .mission(mission)
+                .carbonReduction(carbonReduction)
                 .completedAt(LocalDateTime.now())
                 .build();
 

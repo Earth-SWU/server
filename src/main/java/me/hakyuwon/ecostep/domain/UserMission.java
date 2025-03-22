@@ -31,9 +31,10 @@ public class UserMission {
     private LocalDateTime completedAt;
 
     @Builder
-    public UserMission(User user, Mission mission, LocalDateTime completedAt) {
+    public UserMission(User user, Mission mission, double carbonReduction, LocalDateTime completedAt) {
         this.user = user;
         this.mission = mission;
+        this.carbonReduction = carbonReduction;
         this.completedAt = completedAt;
     }
 }
