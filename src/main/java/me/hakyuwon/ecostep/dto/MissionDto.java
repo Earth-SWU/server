@@ -9,9 +9,17 @@ import me.hakyuwon.ecostep.enums.MissionType;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MissionDto {
-    private Long userId;
+    private Long id;
     private MissionType missionType;
     private String description;
     private double carbonReduction;
     private int missionWater;
+    private boolean completed;
+
+    public MissionDto(Long id, MissionType missionType, String description, boolean completed) {
+        this.id = id;
+        this.missionType = missionType;
+        this.description = description;
+        this.completed = completed;
+    }
 }

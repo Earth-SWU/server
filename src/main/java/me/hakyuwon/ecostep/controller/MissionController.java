@@ -1,6 +1,7 @@
 package me.hakyuwon.ecostep.controller;
 
 import lombok.RequiredArgsConstructor;
+import me.hakyuwon.ecostep.dto.MissionDto;
 import me.hakyuwon.ecostep.dto.StepDataDto;
 import me.hakyuwon.ecostep.dto.UserMissionDto;
 import me.hakyuwon.ecostep.repository.MissionRepository;
@@ -13,6 +14,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Controller
@@ -24,6 +28,14 @@ public class MissionController {
     private final UserRepository userRepository;
     private final MissionRepository missionRepository;
 
+    // 미션 목록 조회
+    @GetMapping("/{userId}")
+    public ResponseEntity<Map<String, List<MissionDto>>> getMission(@PathVariable Long userId) {
+        List<MissionDto> missionDtos = missionService.getAllMissions(userId);
+        Map<String, List<MissionDto>> response = new HashMap<>();
+        response.put("missions", missionDtos);
+        return ResponseEntity.ok(response);
+    }
     // 미션 완료
     @PostMapping("/complete")
     public ResponseEntity<String> completeMission(@RequestBody UserMissionDto userMissionDto) {

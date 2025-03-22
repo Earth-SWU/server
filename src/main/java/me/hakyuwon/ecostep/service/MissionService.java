@@ -2,6 +2,7 @@ package me.hakyuwon.ecostep.service;
 
 import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.domain.*;
+import me.hakyuwon.ecostep.dto.MissionDto;
 import me.hakyuwon.ecostep.dto.StepDataDto;
 import me.hakyuwon.ecostep.enums.BadgeType;
 import me.hakyuwon.ecostep.enums.MissionType;
@@ -11,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,36 @@ public class MissionService {
     // 비료 주는 미션 ID 목록
     private static final Set<Long> FERTILIZER_MISSION_IDS = Set.of(5L);
     private final BadgeRepository badgeRepository;
+
+    // 미션 목록 조회
+    public List<MissionDto> getAllMissions(Long userId) {
+        // 1. 사용자 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // 2. 전체 미션 목록 조회
+        List<Mission> missions = missionRepository.findAll();
+
+        // 3. 오늘 달성한 미션 기록 조회
+        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
+        List<UserMission> todayMissions = userMissionRepository.findByUserAndCompletedAtAfter(user, startOfToday);
+
+        // 4. 오늘 완료한 미션 id Set 만들기
+        Set<Long> completedMissionIds = todayMissions.stream()
+                .map(um -> um.getMission().getId())
+                .collect(Collectors.toSet());
+
+        // 5. 전체 미션을 순회하며 DTO에 달성 여부 설정
+        return missions.stream()
+                .map(mission -> new MissionDto(
+                        mission.getId(),
+                        mission.getMissionType(),
+                        mission.getDescription(),
+                        completedMissionIds.contains(mission.getId()) // 달성 여부
+                ))
+                .collect(Collectors.toList());
+
+    }
 
     // 미션 완료
     @Transactional
