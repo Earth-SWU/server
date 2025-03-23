@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RankingResponse {
     private int rank;
-    private Long userId;
+    private String treeName;
     private int treeLevel;
     private double growth;
 }

@@ -35,7 +35,7 @@ public class RankingService {
         for (Tree tree : trees) {
             rankings.add(new RankingResponse(
                     rank++,
-                    tree.getUser().getId(),
+                    tree.getTreeName(),
                     tree.getTreeLevel(),
                     tree.getTreeGrowth()
             ));
