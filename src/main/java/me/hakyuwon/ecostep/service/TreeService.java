@@ -5,7 +5,9 @@ import me.hakyuwon.ecostep.domain.User;
 import me.hakyuwon.ecostep.dto.TreeResponseDto;
 import me.hakyuwon.ecostep.repository.TreeRepository;
 import me.hakyuwon.ecostep.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class TreeService {
@@ -52,7 +54,7 @@ public class TreeService {
 
         // 물이 0이면 예외 처리
         if (tree.getWater() <= 0) {
-            throw new IllegalArgumentException("물이 부족해요!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "물이 부족해요!");
         }
 
         int water = 1;
