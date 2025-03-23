@@ -9,6 +9,7 @@ import me.hakyuwon.ecostep.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -41,9 +42,9 @@ public class MyPageService {
 
         // 탄소 감축량 통계 조회
         List<UserMission> userMissions = userMissionRepository.findByUser(user);
-        double totalReduction = userMissions.stream()
-                .mapToDouble(UserMission::getCarbonReduction)
-                .sum();
+        BigDecimal totalReduction = userMissions.stream()
+                .map(userMission -> BigDecimal.valueOf(userMission.getCarbonReduction()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         CarbonStatsDto carbonStats = new CarbonStatsDto(userId, totalReduction);
 
         // 이번 달 미션 달성률 조회
