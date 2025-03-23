@@ -31,6 +31,7 @@ public class RankingService {
     private List<RankingResponse> mapToRankingResponse(List<Tree> trees) {
         List<RankingResponse> rankings = new ArrayList<>();
         int rank = 1;
+
         for (Tree tree : trees) {
             rankings.add(new RankingResponse(
                     rank++,
