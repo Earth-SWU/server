@@ -150,7 +150,7 @@ public class UserController {
             }
 
         userService.firstBadge(userId);
-        return ResponseEntity.ok("비기너 뱃지가 지급되었습니다.");}
+        return ResponseEntity.ok("에코스텝 비기너");}
         catch (Exception e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
