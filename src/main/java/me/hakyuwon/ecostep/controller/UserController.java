@@ -50,7 +50,6 @@ public class UserController {
     }
 
 
-
     // 회원 탈퇴
     @DeleteMapping("/api/users/delete")
     public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token) {

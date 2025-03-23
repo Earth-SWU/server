@@ -50,6 +50,11 @@ public class TreeService {
         Tree tree = treeRepository.findByUser(user)
                 .orElseThrow(() -> new IllegalArgumentException("트리 정보가 없습니다."));
 
+        // 물이 0이면 예외 처리
+        if (tree.getWater() <= 0) {
+            throw new IllegalArgumentException("물이 부족해요!");
+        }
+
         int water = 1;
         int growth = 15;
 
