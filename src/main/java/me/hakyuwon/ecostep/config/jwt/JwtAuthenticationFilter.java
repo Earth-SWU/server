@@ -39,33 +39,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
         String email = tokenProvider.extractUserEmail(token);
 
-        /*try {
-            email = tokenProvider.extractUserEmail(token); // JWT에서 email 추출
-        } catch (ExpiredJwtException e) {
-            // 만료된 토큰 처리 로직
-            String refreshToken = request.getHeader("Refresh-Token");  // 리프레시 토큰을 헤더에서 가져옴
-            if (refreshToken != null && tokenProvider.validateRefreshToken(refreshToken)) {
-
-                String newAccessToken = tokenProvider.generateAccessTokenFromRefresh(refreshToken);
-                response.setHeader("Authorization", "Bearer " + newAccessToken);
-
-                token = newAccessToken;
-                email = tokenProvider.extractUserEmail(token);
-
-            }
-
-            else {
-                // 리프레시 토큰이 없거나 유효하지 않은 경우, 로그인이 필요함을 알려줌
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Token expired and refresh token is invalid or missing.");
-                return;
-            }
-        }*/
-
         // SecurityContext에 인증 정보가 없고, email이 존재하는 경우
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+            if (userDetails == null) {
+                // 디버깅을 위해 로그 추가 또는 예외 처리
+                System.out.println("User not found with email: " + email);
+                filterChain.doFilter(request, response);  // 인증 실패 후 필터 체인 진행
+                return;
+            }
 
             if (tokenProvider.validateToken(token, userDetails)) { // 토큰 검증
                 UsernamePasswordAuthenticationToken authentication =
@@ -73,6 +56,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication); // 인증 정보 저장
+            } else {
+                // 토큰 검증 실패 시 로그 추가
+                System.out.println("Token validation failed");
+                filterChain.doFilter(request, response);
+                return;
             }
         }
 

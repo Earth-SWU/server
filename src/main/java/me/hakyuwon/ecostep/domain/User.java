@@ -7,6 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -45,10 +46,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if ("admin@example.com".equals(this.email)) {
-            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        }
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return Collections.emptyList();
     }
     // 특정 이메일이 관리자 역할을 가짐
 

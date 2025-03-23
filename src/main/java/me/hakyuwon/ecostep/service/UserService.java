@@ -106,6 +106,10 @@ public class UserService {
         Badge badge = badgeRepository.findByName("에코스텝 비기너")
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 뱃지입니다."));
 
+        if (userBadgeRepository.existsByUserAndBadge(user, badge)) {
+            throw new IllegalStateException("이미 해당 뱃지를 보유하고 있습니다.");
+        }
+
         UserBadge userBadge = new UserBadge();
         userBadge.setUser(user);
         userBadge.setBadge(badge);

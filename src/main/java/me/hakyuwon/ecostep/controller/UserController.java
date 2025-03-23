@@ -132,9 +132,29 @@ public class UserController {
 
     // 회원가입 이후, 첫 뱃지 지급 api
     @PostMapping("/api/beginner/{userId}")
-    public ResponseEntity<String> assignBeginnerBadge(@PathVariable Long userId) {
+    public ResponseEntity<String> assignBeginnerBadge(@PathVariable Long userId, @RequestHeader("Authorization") String token) {
+        try{
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            Claims claims = tokenProvider.getClaims(token); // 토큰에서 payload 추출
+            String email = claims.getSubject();
+
+            User user1 = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다. 1"));
+            User user2 = userRepository.findByEmail(email)
+                    .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다. 2"));
+
+            // 요청된 userId와 인증된 userId가 일치하는지 검증
+            if (!user1.getId().equals(user2.getId())) {
+                throw new SecurityException("잘못된 접근입니다.");
+            }
+
         userService.firstBadge(userId);
-        return ResponseEntity.ok("비기너 뱃지가 지급되었습니다.");
+        return ResponseEntity.ok("비기너 뱃지가 지급되었습니다.");}
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
     }
 
     /* 비밀번호 재설정
