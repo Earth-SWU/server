@@ -7,11 +7,13 @@ import me.hakyuwon.ecostep.domain.UserMission;
 import me.hakyuwon.ecostep.dto.*;
 import me.hakyuwon.ecostep.repository.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ public class MyPageService {
     private final TreeRepository treeRepository;
     private final UserBadgeRepository userBadgeRepository;
 
+    @Transactional
     public MyPageDto getMyPage(@PathVariable Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
@@ -33,9 +36,14 @@ public class MyPageService {
         // user 트리네임 겟, 뱃지 개수, 미션 수행 개수, 나무레벨 겟
         Tree tree = treeRepository.findByUser(user)
                 .orElseThrow(()-> new IllegalArgumentException("유효하지 않은 나무입니다."));
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(23, 59, 59);
+
         String treeName = tree.getTreeName();
         int badgeCount = userBadgeRepository.countByUser(user);
-        int missionCount = userMissionRepository.countByUser(user);
+        int missionCount = userMissionRepository.countByUserAndCompletedAtBetween(user, startOfDay, endOfDay);
         int treeLevel = tree.getTreeLevel();
 
         ProfileDto profile = new ProfileDto(treeName, badgeCount, missionCount, treeLevel);
@@ -98,6 +106,7 @@ public class MyPageService {
         return new MyPageDto(profile, carbonStats, missionProgress);
     }
 
+    @Transactional
     public ProfileDto getProfile(@PathVariable Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
@@ -105,9 +114,13 @@ public class MyPageService {
         Tree tree = treeRepository.findByUser(user)
                 .orElseThrow(()-> new IllegalArgumentException("유효하지 않은 나무입니다."));
 
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
         String treeName = tree.getTreeName();
         int badgeCount = userBadgeRepository.countByUser(user);
-        int missionCount = userMissionRepository.countByUser(user);
+        int missionCount = userMissionRepository.countByUserAndCompletedAtBetween(user, startOfDay, endOfDay);
         int treeLevel = tree.getTreeLevel();
 
         return ProfileDto.builder()
