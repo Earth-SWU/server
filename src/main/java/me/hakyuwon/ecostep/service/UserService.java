@@ -117,4 +117,5 @@ public class UserService {
 
         userBadgeRepository.save(userBadge);
     }
+
 }

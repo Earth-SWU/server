@@ -45,9 +45,9 @@ public class MissionController {
     }
     // 미션 완료
     @PostMapping("/complete")
-    public ResponseEntity<String> completeMission(@RequestBody UserMissionDto userMissionDto) {
-        String result = missionService.completeMission(userMissionDto.getUserId(), userMissionDto.getMissionId());
-        return ResponseEntity.ok(result);
+    public ResponseEntity<MissionDto.MissionBadgeResponseDto> completeMission(@RequestBody UserMissionDto userMissionDto) {
+        MissionDto.MissionBadgeResponseDto response = missionService.completeMission(userMissionDto.getUserId(), userMissionDto.getMissionId());
+        return ResponseEntity.ok(response);
     }
 
     // 출석 체크 미션
@@ -90,6 +90,11 @@ public class MissionController {
     }
 
     // 각 뱃지 지급 api
+    @PostMapping("/badge/check")
+    public ResponseEntity<String> checkBadge(@RequestBody UserMissionDto userMissionDto) {
+        return missionService.checkBadge(userMissionDto.getUserId(), userMissionDto.getMissionId());
+    }
+
 
     // 친환경 물품 구매
 

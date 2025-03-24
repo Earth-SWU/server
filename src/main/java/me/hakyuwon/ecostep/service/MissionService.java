@@ -7,6 +7,7 @@ import me.hakyuwon.ecostep.dto.StepDataDto;
 import me.hakyuwon.ecostep.enums.BadgeType;
 import me.hakyuwon.ecostep.enums.MissionType;
 import me.hakyuwon.ecostep.repository.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,42 +64,69 @@ public class MissionService {
 
     // 미션 완료
     @Transactional
-    public String completeMission(Long userId, Long missionId) {
+    public MissionDto.MissionBadgeResponseDto completeMission(Long userId, Long missionId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
         Mission mission = missionRepository.findById(missionId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 미션입니다."));
-
         Tree tree = treeRepository.findByUser(user)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저의 트리가 존재하지 않음"));
 
         // 오늘 날짜의 시작 시간 (00:00)
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         double carbonReduction = mission.getCarbonReduction();
+        String missionMessage;
 
-        // 오늘 해당 미션을 이미 완료했는지 확인
-        if (userMissionRepository.existsByUserAndMissionAndCompletedAtAfter(user, mission, startOfDay)) {
-            return "이미 완료한 미션입니다.";
+        boolean alreadyCompleted = userMissionRepository.existsByUserAndMissionAndCompletedAtAfter(user, mission, startOfDay);
+        if (!alreadyCompleted) {
+            // 미션 완료 기록 생성
+            UserMission userMission = UserMission.builder()
+                    .user(user)
+                    .mission(mission)
+                    .carbonReduction(carbonReduction)
+                    .completedAt(LocalDateTime.now())
+                    .build();
+
+            // 미션 유형에 따른 트리 업데이트
+            if (WATER_MISSION_IDS.contains(missionId)) {
+                tree.applyItems(1, 0);
+            } else if (FERTILIZER_MISSION_IDS.contains(missionId)) {
+                tree.applyItems(0, 1);
+            }
+
+            userMissionRepository.save(userMission);
+            treeRepository.save(tree);
+            missionMessage = "미션이 완료되었습니다.";
+        } else {
+            missionMessage = "이미 완료한 미션입니다.";
         }
 
-        UserMission userMission = UserMission.builder()
-                .user(user)
-                .mission(mission)
-                .carbonReduction(carbonReduction)
-                .completedAt(LocalDateTime.now())
-                .build();
+        // 해당 미션 수행 횟수 조회
+        long missionCount = userMissionRepository.countByUserAndMission(user, mission);
 
-        if (WATER_MISSION_IDS.contains(missionId)) {
-            tree.applyItems(1,0);
-        } else if (FERTILIZER_MISSION_IDS.contains(missionId)) {
-            tree.applyItems(0,1);
+        // 뱃지 지급 여부 판단
+        BadgeType badgeType = mission.getMissionType().getBadgeType();
+        String badgeMessage;
+        if (missionCount >= badgeType.getRequiredCount()) {
+            Badge badge = badgeRepository.findByName(mission.getMissionType().getBadgeName())
+                    .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 뱃지입니다."));
+            if (userBadgeRepository.existsByUserAndBadge(user, badge)) {
+                badgeMessage = "이미 받은 뱃지입니다.";
+            } else {
+                // 뱃지 지급
+                UserBadge userBadge = new UserBadge();
+                userBadge.setUser(user);
+                userBadge.setBadge(badge);
+                userBadge.setAwardedAt(LocalDate.now());
+                userBadgeRepository.save(userBadge);
+                badgeMessage = "뱃지가 성공적으로 지급되었습니다.";
+            }
+        } else {
+            badgeMessage = "뱃지 지급 조건을 충족하지 않았습니다.";
         }
 
-        userMissionRepository.save(userMission);
-        treeRepository.save(tree);
-        checkBadge(userId, missionId);
-        return "미션 완료!";
+        // 미션 완료 메시와 함께 수행 횟수, 뱃지 메시지를 함께 반환
+        return new MissionDto.MissionBadgeResponseDto(missionCount, missionMessage, badgeMessage);
     }
 
     // 출석 체크
@@ -129,17 +157,16 @@ public class MissionService {
         boolean alreadyCompleted = userMissionRepository.existsByUserAndMissionAndCompletedAtAfter(user, mission, today.atStartOfDay());
 
         int step = stepDataDto.getSteps();
-        if (step>=3000) {
+        if (step >= 3000) {
             if (alreadyCompleted) {
                 return "이미 걸음수 체크를 했어요.";
             }
             return "3000보 이상 걷고, 물 받아요!";
-        }
-        else return "아직 걸음수가 모자라요!";
+        } else return "아직 걸음수가 모자라요!";
     }
 
     @Transactional
-    public void checkBadge(Long userId, Long missionId) {
+    public ResponseEntity<String> checkBadge(Long userId, Long missionId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -159,7 +186,7 @@ public class MissionService {
                     .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 뱃지입니다."));
 
             if (userBadgeRepository.existsByUserAndBadge(user, badge)) {
-                return ;
+                return ResponseEntity.ok("이미 받은 뱃지입니다.");
             } else {
                 // 조건을 만족하면 뱃지 부여
                 Badge newBadge = new Badge();
@@ -174,6 +201,6 @@ public class MissionService {
                 userBadgeRepository.save(userBadge);
             }
         }
+            return ResponseEntity.ok("뱃지 지급 조건을 충족하지 않았습니다.");
     }
-
 }
