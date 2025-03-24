@@ -14,13 +14,11 @@ import java.util.Date;
 public class TokenProvider {
 
     private final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 60 * 6; // 6시간
-    private final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24 * 30; // 30일
+    private final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24 * 20; // 30일
 
     @Value("${jwt.secret}")
     private String secretKey;
 
-    long expirationTime = System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY;
-    Date expirationDate = new Date(expirationTime);
     // 토큰 생성
     public String createToken(String email){
         return Jwts.builder()
@@ -36,7 +34,7 @@ public class TokenProvider {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(expirationDate)
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
