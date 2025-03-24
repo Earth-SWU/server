@@ -19,6 +19,8 @@ public class TokenProvider {
     @Value("${jwt.secret}")
     private String secretKey;
 
+    long expirationTime = System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY;
+    Date expirationDate = new Date(expirationTime);
     // 토큰 생성
     public String createToken(String email){
         return Jwts.builder()
@@ -34,7 +36,7 @@ public class TokenProvider {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY)) // 7일 동안 유효
+                .setExpiration(expirationDate)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
