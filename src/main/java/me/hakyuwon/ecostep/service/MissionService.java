@@ -103,30 +103,7 @@ public class MissionService {
 
         // 해당 미션 수행 횟수 조회
         long missionCount = userMissionRepository.countByUserAndMission(user, mission);
-
-        // 뱃지 지급 여부 판단
-        BadgeType badgeType = mission.getMissionType().getBadgeType();
-        String badgeMessage;
-        if (missionCount >= badgeType.getRequiredCount()) {
-            Badge badge = badgeRepository.findByName(mission.getMissionType().getBadgeName())
-                    .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 뱃지입니다."));
-            if (userBadgeRepository.existsByUserAndBadge(user, badge)) {
-                badgeMessage = "이미 받은 뱃지입니다.";
-            } else {
-                // 뱃지 지급
-                UserBadge userBadge = new UserBadge();
-                userBadge.setUser(user);
-                userBadge.setBadge(badge);
-                userBadge.setAwardedAt(LocalDate.now());
-                userBadgeRepository.save(userBadge);
-                badgeMessage = "뱃지가 성공적으로 지급되었습니다.";
-            }
-        } else {
-            badgeMessage = "뱃지 지급 조건을 충족하지 않았습니다.";
-        }
-
-        // 미션 완료 메시와 함께 수행 횟수, 뱃지 메시지를 함께 반환
-        return new MissionDto.MissionBadgeResponseDto(missionCount, missionMessage, badgeMessage);
+        return new MissionDto.MissionBadgeResponseDto(missionCount, missionMessage);
     }
 
     // 출석 체크

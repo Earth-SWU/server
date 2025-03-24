@@ -25,12 +25,10 @@ public class MissionDto {
     public static class MissionBadgeResponseDto{
         private long missionCount;
         private String missionMessage;
-        private String badgeMessage;
 
-        public MissionBadgeResponseDto(long missionCount, String missionMessage, String badgeMessage) {
+        public MissionBadgeResponseDto(long missionCount, String missionMessage) {
             this.missionCount = missionCount;
             this.missionMessage = missionMessage;
-            this.badgeMessage = badgeMessage;
         }
     }
 }
