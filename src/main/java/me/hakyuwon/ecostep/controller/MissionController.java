@@ -13,6 +13,7 @@ import me.hakyuwon.ecostep.repository.UserRepository;
 import me.hakyuwon.ecostep.service.MissionService;
 import me.hakyuwon.ecostep.service.ReceiptOCR;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.token.TokenService;
 import org.springframework.stereotype.Controller;
@@ -45,9 +46,31 @@ public class MissionController {
     }
     // 미션 완료
     @PostMapping("/complete")
-    public ResponseEntity<MissionDto.MissionBadgeResponseDto> completeMission(@RequestBody UserMissionDto userMissionDto) {
-        MissionDto.MissionBadgeResponseDto response = missionService.completeMission(userMissionDto.getUserId(), userMissionDto.getMissionId());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<MissionDto.MissionBadgeResponseDto> completeMission(@RequestBody UserMissionDto userMissionDto, @RequestHeader("Authorization") String token) {
+        try {
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            Claims claims = tokenProvider.getClaims(token); // 토큰에서 payload 추출
+            String email = claims.getSubject();
+
+            User user1 = userRepository.findByEmail(email)
+                    .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+            User user2 = userRepository.findById(userMissionDto.getUserId())
+                    .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다. 2"));
+
+            // 요청된 userId와 인증된 userId가 일치하는지 검증
+            if (!user1.getId().equals(user2.getId())) {
+                throw new SecurityException("잘못된 접근입니다.");
+            }
+
+            MissionDto.MissionBadgeResponseDto response = missionService.completeMission(userMissionDto.getUserId(), userMissionDto.getMissionId());
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
     }
 
     // 출석 체크 미션
