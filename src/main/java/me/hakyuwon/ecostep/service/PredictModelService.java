@@ -28,11 +28,13 @@ public class PredictModelService {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
         // 이미지 파일을 전송할 MultiValueMap 생성
+        String asciiFileName = new String(image.getOriginalFilename().getBytes("UTF-8"), "ISO-8859-1");
+
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("file", new ByteArrayResource(image.getBytes()) {
             @Override
             public String getFilename() {
-                return image.getOriginalFilename(); // 파일 이름 설정
+                return asciiFileName; // ASCII 변환된 파일 이름 사용
             }
         });
 
