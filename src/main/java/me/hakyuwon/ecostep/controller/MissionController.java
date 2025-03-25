@@ -135,7 +135,6 @@ public class MissionController {
                     .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
             String result = ocrService.analyzeReceipt(file);
-            missionService.completeMission(user.getId(),2L);
 
             return ResponseEntity.ok(result);
         } catch (Exception e) {
@@ -146,9 +145,23 @@ public class MissionController {
     // 텀블러 사용 미션
     @PostMapping("/tumbler")
     @ResponseBody
-    public String checkMission(@RequestParam("file") MultipartFile file) throws IOException {
-        boolean success = predictModelService.isMissionSuccessful(file);
-        return success ? "미션 성공!" : "미션 실패";
+    public String checkMission(@RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String token) throws IOException {
+        try {
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            Claims claims = tokenProvider.getClaims(token); // 토큰에서 payload 추출
+            String email = claims.getSubject();
+
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+            boolean success = predictModelService.isMissionSuccessful(file);
+
+            return success ? "미션 성공!" : "미션 실패";
+        } catch (Exception e) {
+            return "예외 발생";
+        }
     }
 
     // 3000보 이상 걷기
@@ -170,6 +183,7 @@ public class MissionController {
             if (!user1.getId().equals(user2.getId())) {
                 throw new SecurityException("잘못된 접근입니다.");
             }
+
             String result = missionService.checkSteps(stepDto);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
