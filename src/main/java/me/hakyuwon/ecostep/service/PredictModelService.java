@@ -19,7 +19,7 @@ import java.util.Map;
 public class PredictModelService {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private static final String FASTAPI_URL = "http://localhost:8000/predict/"; // FastAPI 서버의 URL
+    private static final String FASTAPI_URL = "http://ecostep.co.kr:8000/predict/"; // FastAPI 서버의 URL
 
     public boolean isMissionSuccessful() {
         // API 요청
