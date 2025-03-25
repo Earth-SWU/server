@@ -37,16 +37,27 @@ public class UserController {
 
     // 회원가입
     @PostMapping("/api/users/signup")
-    public ResponseEntity<UserDto.UserSignupResponseDto> signup(@RequestBody UserSignUpRequest request){
+    public ResponseEntity<Object> signup(@RequestBody UserSignUpRequest request){
+        if (userRepository.existsByEmail(request.getEmail())) {
+            return ResponseEntity.badRequest().body("이미 등록된 이메일입니다.");
+        }
+
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body("비밀번호가 일치하지 않습니다.");
+        }
         UserDto.UserSignupResponseDto signupResponse = userService.signUp(request);
         return ResponseEntity.ok().body(signupResponse);
     }
 
     // 로그인
     @PostMapping("/api/users/login")
-    public ResponseEntity<UserDto.UserLoginResponseDto> login(@RequestBody UserLoginRequest request){
-        UserDto.UserLoginResponseDto loginResponse = userService.logIn(request);
-        return ResponseEntity.ok().body(loginResponse);
+    public ResponseEntity<Object> login(@RequestBody UserLoginRequest request){
+        try {
+            UserDto.UserLoginResponseDto loginResponse = userService.logIn(request);
+            return ResponseEntity.ok(loginResponse);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 
