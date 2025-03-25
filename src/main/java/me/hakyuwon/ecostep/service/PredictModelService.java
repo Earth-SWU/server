@@ -12,18 +12,28 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpHeaders;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class PredictModelService {
-    @Autowired
-    private RestTemplate restTemplate;
 
-    private static final String FASTAPI_URL = "http://172.19.6.88:8000/predict/"; // FastAPI 서버의 URL
+    private final RestTemplate restTemplate = new RestTemplate();
+    private static final String FASTAPI_URL = "http://localhost:8000/predict/"; // FastAPI 서버의 URL
 
-    public PredictModelService(RestTemplateBuilder restTemplateBuilder) {
-        this.restTemplate = restTemplateBuilder.build();
+    public boolean isMissionSuccessful() {
+        // API 요청
+        ResponseEntity<Map> response = restTemplate.getForEntity(FASTAPI_URL, Map.class);
+
+        // JSON 응답 처리
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            String classification = (String) response.getBody().get("class");
+            return "reusable".equals(classification); // reusable이면 성공
+        }
+
+        return false; // 실패 처리
     }
-
+    /*
     public PredictDto.PredictResponse callPredictAPI(String inputData) {
         // 요청 객체 설정
         try {
@@ -47,5 +57,5 @@ public class PredictModelService {
         // 예외 발생 시 로깅 후 적절한 응답 반환
         throw new RuntimeException("FastAPI 호출 중 오류 발생: " + e.getMessage(), e);
     }
-    }
+    }*/
 }

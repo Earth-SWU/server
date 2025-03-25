@@ -11,6 +11,7 @@ import me.hakyuwon.ecostep.repository.MissionRepository;
 import me.hakyuwon.ecostep.repository.UserMissionRepository;
 import me.hakyuwon.ecostep.repository.UserRepository;
 import me.hakyuwon.ecostep.service.MissionService;
+import me.hakyuwon.ecostep.service.PredictModelService;
 import me.hakyuwon.ecostep.service.ReceiptOCR;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,12 +30,11 @@ import java.util.Map;
 @Controller
 @RequestMapping("/api/missions")
 public class MissionController {
-    @Autowired
     private final MissionService missionService;
     private final ReceiptOCR ocrService;
     private final TokenProvider tokenProvider;
     private final UserRepository userRepository;
-    private final MissionRepository missionRepository;
+    private final PredictModelService predictModelService;
 
     // 미션 목록 조회
     @GetMapping("/{userId}")
@@ -143,7 +143,11 @@ public class MissionController {
     }
 
     // 텀블러 사용 미션
-
+    @GetMapping("/tumbler")
+    public String checkMission() {
+        boolean success = predictModelService.isMissionSuccessful();
+        return success ? "미션 성공!" : "미션 실패";
+    }
 
     // 3000보 이상 걷기
     @PostMapping("/walk")

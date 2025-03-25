@@ -110,10 +110,10 @@ public class MyPageController {
         }
             }
 
-    // 예측 모델
+    /* 예측 모델
     @PostMapping("/api/me/predict")
     public ResponseEntity<PredictDto.PredictResponse> getPrediction(@RequestBody PredictDto.PredictRequest request) {
         PredictDto.PredictResponse predictionResult = predictModelService.callPredictAPI(request.getInputData());
         return ResponseEntity.ok(predictionResult);
-    }
+    }*/
 }

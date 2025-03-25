@@ -123,6 +123,7 @@ public class MissionService {
         return "매일 출석하고 물 받아요!";
     }
 
+    // 걸음수
     @Transactional
     public String checkSteps(StepDataDto stepDataDto) {
         User user = userRepository.findById(stepDataDto.getUserId())
