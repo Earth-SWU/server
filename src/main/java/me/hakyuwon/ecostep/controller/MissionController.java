@@ -145,6 +145,7 @@ public class MissionController {
 
     // 텀블러 사용 미션
     @PostMapping("/tumbler")
+    @ResponseBody
     public String checkMission(@RequestParam("file") MultipartFile file) throws IOException {
         boolean success = predictModelService.isMissionSuccessful(file);
         return success ? "미션 성공!" : "미션 실패";
