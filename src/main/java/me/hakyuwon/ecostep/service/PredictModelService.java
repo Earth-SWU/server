@@ -4,14 +4,15 @@ import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.dto.PredictDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpHeaders;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 @Service
@@ -21,9 +22,24 @@ public class PredictModelService {
     private final RestTemplate restTemplate = new RestTemplate();
     private static final String FASTAPI_URL = "http://43.200.154.213:8000/predict/"; // FastAPI 서버의 URL
 
-    public boolean isMissionSuccessful() {
-        // API 요청
-        ResponseEntity<Map> response = restTemplate.getForEntity(FASTAPI_URL, Map.class);
+    public boolean isMissionSuccessful(MultipartFile image) throws IOException {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        // 이미지 파일을 전송할 MultiValueMap 생성
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", new ByteArrayResource(image.getBytes()) {
+            @Override
+            public String getFilename() {
+                return image.getOriginalFilename(); // 파일 이름 설정
+            }
+        });
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        // FastAPI 서버에 POST 요청
+        ResponseEntity<Map> response = restTemplate.postForEntity(FASTAPI_URL, requestEntity, Map.class);
 
         // JSON 응답 처리
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {

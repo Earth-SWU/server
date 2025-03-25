@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -143,9 +144,9 @@ public class MissionController {
     }
 
     // 텀블러 사용 미션
-    @GetMapping("/tumbler")
-    public String checkMission() {
-        boolean success = predictModelService.isMissionSuccessful();
+    @PostMapping("/tumbler")
+    public String checkMission(@RequestParam("file") MultipartFile file) throws IOException {
+        boolean success = predictModelService.isMissionSuccessful(file);
         return success ? "미션 성공!" : "미션 실패";
     }
 
