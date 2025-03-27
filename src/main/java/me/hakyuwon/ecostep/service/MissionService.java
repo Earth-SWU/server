@@ -42,26 +42,25 @@ public class MissionService {
         // 2. 전체 미션 목록 조회
         List<Mission> missions = missionRepository.findAll();
 
-        // 3. 오늘 달성한 미션 기록 조회
-        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
-        List<UserMission> todayMissions = userMissionRepository.findByUserAndCompletedAtAfter(user, startOfToday);
+        LocalDate today = LocalDate.now();
 
-        // 4. 오늘 완료한 미션 id Set 만들기
-        Set<Long> completedMissionIds = todayMissions.stream()
+        // 4. 사용자 미션 기록 전체 조회
+        List<UserMission> userMissions = userMissionRepository.findByUser(user);
+
+        // 5. 오늘 완료한 미션 ID Set 생성 (completedAt의 날짜만 비교)
+        Set<Long> completedMissionIds = userMissions.stream()
+                .filter(um -> um.getCompletedAt().toLocalDate().isEqual(today)) // 오늘 날짜와 비교
                 .map(um -> um.getMission().getId())
                 .collect(Collectors.toSet());
 
-        // 5. 전체 미션을 순회하며 DTO에 달성 여부 설정
+        // 6. 전체 미션을 순회하며 DTO에 오늘 달성 여부 설정
         return missions.stream()
-                .map(mission -> {
-                    boolean isCompletedToday = completedMissionIds.contains(mission.getId()); // 오늘 달성 여부
-                    return new MissionDto(
-                            mission.getId(),
-                            mission.getMissionType(),
-                            mission.getDescription(),
-                            isCompletedToday
-                    );
-                })
+                .map(mission -> new MissionDto(
+                        mission.getId(),
+                        mission.getMissionType(),
+                        mission.getDescription(),
+                        completedMissionIds.contains(mission.getId()) // 오늘 달성 여부
+                ))
                 .collect(Collectors.toList());
     }
 
