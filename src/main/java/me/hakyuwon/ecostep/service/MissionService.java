@@ -53,12 +53,15 @@ public class MissionService {
 
         // 5. 전체 미션을 순회하며 DTO에 달성 여부 설정
         return missions.stream()
-                .map(mission -> new MissionDto(
-                        mission.getId(),
-                        mission.getMissionType(),
-                        mission.getDescription(),
-                        completedMissionIds.contains(mission.getId()) // 달성 여부
-                ))
+                .map(mission -> {
+                    boolean isCompletedToday = completedMissionIds.contains(mission.getId()); // 오늘 달성 여부
+                    return new MissionDto(
+                            mission.getId(),
+                            mission.getMissionType(),
+                            mission.getDescription(),
+                            isCompletedToday
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
