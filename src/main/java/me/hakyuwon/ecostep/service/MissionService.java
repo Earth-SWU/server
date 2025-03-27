@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public class MissionService {
         // 2. 전체 미션 목록 조회
         List<Mission> missions = missionRepository.findAll();
 
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 
         // 4. 사용자 미션 기록 전체 조회
         List<UserMission> userMissions = userMissionRepository.findByUser(user);
