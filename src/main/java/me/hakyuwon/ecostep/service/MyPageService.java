@@ -5,6 +5,8 @@ import me.hakyuwon.ecostep.domain.Tree;
 import me.hakyuwon.ecostep.domain.User;
 import me.hakyuwon.ecostep.domain.UserMission;
 import me.hakyuwon.ecostep.dto.*;
+import me.hakyuwon.ecostep.exception.CustomException;
+import me.hakyuwon.ecostep.exception.ErrorCode;
 import me.hakyuwon.ecostep.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,11 +33,11 @@ public class MyPageService {
     @Transactional
     public MyPageDto getMyPage(@PathVariable Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // user 트리네임 겟, 뱃지 개수, 미션 수행 개수, 나무레벨 겟
         Tree tree = treeRepository.findByUser(user)
-                .orElseThrow(()-> new IllegalArgumentException("유효하지 않은 나무입니다."));
+                .orElseThrow(()-> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         LocalDate today = LocalDate.now();
         LocalDateTime startOfDay = today.atStartOfDay();
@@ -109,10 +111,10 @@ public class MyPageService {
     @Transactional
     public ProfileDto getProfile(@PathVariable Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         // user 트리네임 겟, 뱃지 개수, 미션 수행 개수, 나무레벨 겟
         Tree tree = treeRepository.findByUser(user)
-                .orElseThrow(()-> new IllegalArgumentException("유효하지 않은 나무입니다."));
+                .orElseThrow(()-> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         LocalDate today = LocalDate.now();
         LocalDateTime startOfDay = today.atStartOfDay();

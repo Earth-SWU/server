@@ -1,10 +1,13 @@
 package me.hakyuwon.ecostep.controller;
 
 import io.jsonwebtoken.Claims;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.config.jwt.TokenProvider;
 import me.hakyuwon.ecostep.domain.User;
 import me.hakyuwon.ecostep.dto.*;
+import me.hakyuwon.ecostep.exception.CustomException;
+import me.hakyuwon.ecostep.exception.ErrorCode;
 import me.hakyuwon.ecostep.repository.UserRepository;
 import me.hakyuwon.ecostep.service.MailService;
 import me.hakyuwon.ecostep.service.TreeService;
@@ -12,6 +15,8 @@ import me.hakyuwon.ecostep.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,69 +42,34 @@ public class UserController {
 
     // 회원가입
     @PostMapping("/api/users/signup")
-    public ResponseEntity<Object> signup(@RequestBody UserSignUpRequest request){
-        if (userRepository.existsByEmail(request.getEmail())) {
-            return ResponseEntity.badRequest().body("이미 등록된 이메일입니다.");
-        }
-
-        if (!request.getPassword().equals(request.getConfirmPassword())) {
-            return ResponseEntity.badRequest().body("비밀번호가 일치하지 않습니다.");
-        }
-        UserDto.UserSignupResponseDto signupResponse = userService.signUp(request);
-        return ResponseEntity.ok().body(signupResponse);
+    public ResponseEntity<Object> signup(@RequestBody @Valid UserSignUpRequest request){
+        return ResponseEntity.ok().body(userService.signUp(request));
     }
 
     // 로그인
     @PostMapping("/api/users/login")
     public ResponseEntity<Object> login(@RequestBody UserLoginRequest request){
-        try {
-            UserDto.UserLoginResponseDto loginResponse = userService.logIn(request);
-            return ResponseEntity.ok(loginResponse);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(userService.logIn(request));
     }
-
 
     // 회원 탈퇴
     @DeleteMapping("/api/users/delete")
-    public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token) {
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7); // Bearer을 제거하고 token만 남겨두는 과정
-        }
-
-        Claims claims = tokenProvider.getClaims(token); // 토큰에서 payload 추출
-        String email = claims.getSubject(); // payload의 sub인 email을 추출
-
-        userService.deleteUser(email); // 그 이메일로 delete 실행
+    public ResponseEntity<String> deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        userService.deleteUser(email);
         return ResponseEntity.ok("회원 탈퇴 성공");
     }
 
     // 메인 화면
     @GetMapping("/api/home/{userId}")
-    public ResponseEntity<TreeResponseDto> getHome(@PathVariable Long userId, @RequestHeader("Authorization") String token){
-        try{
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
+    public ResponseEntity<TreeResponseDto> getHome(@PathVariable Long userId, @AuthenticationPrincipal UserDetails userDetails){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        if (!user.getEmail().equals(userDetails.getUsername())) {
+                throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
-        Claims claims = tokenProvider.getClaims(token); // 토큰에서 payload 추출
-        String email = claims.getSubject();
-
-        User user1 = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다. 1"));
-        User user2 = userRepository.findByEmail(email)
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다. 2"));
-
-        // 요청된 userId와 인증된 userId가 일치하는지 검증
-        if (!user1.getId().equals(user2.getId())) {
-            throw new SecurityException("잘못된 접근입니다.");
-        }
-        // 트리 정보 가져오기
         TreeResponseDto treeInfo = treeService.getTreeInfo(userId);
-        return ResponseEntity.ok(treeInfo);}
-        catch (Exception e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
+        return ResponseEntity.ok(treeInfo);
     }
 
     // 인증 메일 전송
@@ -129,7 +99,7 @@ public class UserController {
         String refreshToken = refreshTokenRequest.get("refreshToken");
 
         if (refreshToken == null || !tokenProvider.validateRefreshToken(refreshToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("message", "Invalid or expired refresh token"));
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
         // 리프레시 토큰으로 새로운 액세스 토큰 발급
@@ -142,29 +112,15 @@ public class UserController {
 
     // 회원가입 이후, 첫 뱃지 지급 api
     @PostMapping("/api/beginner/{userId}")
-    public ResponseEntity<String> assignBeginnerBadge(@PathVariable Long userId, @RequestHeader("Authorization") String token) {
-        try{
-            if (token.startsWith("Bearer ")) {
-                token = token.substring(7);
-            }
-            Claims claims = tokenProvider.getClaims(token); // 토큰에서 payload 추출
-            String email = claims.getSubject();
-
-            User user1 = userRepository.findById(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다. 1"));
-            User user2 = userRepository.findByEmail(email)
-                    .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다. 2"));
-
-            // 요청된 userId와 인증된 userId가 일치하는지 검증
-            if (!user1.getId().equals(user2.getId())) {
-                throw new SecurityException("잘못된 접근입니다.");
-            }
+    public ResponseEntity<String> assignBeginnerBadge(@PathVariable Long userId, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        if (!user.getEmail().equals(userDetails.getUsername())) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
 
         userService.firstBadge(userId);
-        return ResponseEntity.ok("에코스텝 비기너");}
-        catch (Exception e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
+        return ResponseEntity.ok("에코스텝 비기너");
     }
 
     /* 비밀번호 재설정

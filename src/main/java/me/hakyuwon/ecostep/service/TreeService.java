@@ -3,6 +3,8 @@ package me.hakyuwon.ecostep.service;
 import me.hakyuwon.ecostep.domain.Tree;
 import me.hakyuwon.ecostep.domain.User;
 import me.hakyuwon.ecostep.dto.TreeResponseDto;
+import me.hakyuwon.ecostep.exception.CustomException;
+import me.hakyuwon.ecostep.exception.ErrorCode;
 import me.hakyuwon.ecostep.repository.TreeRepository;
 import me.hakyuwon.ecostep.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -21,10 +23,10 @@ public class TreeService {
 
     public TreeResponseDto setTreeName(Long userId, String name) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Tree tree = treeRepository.findByUser(user)
-                .orElseThrow(() -> new IllegalArgumentException("트리 정보가 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         tree.setTreeName(name);
         treeRepository.save(tree);
@@ -36,10 +38,10 @@ public class TreeService {
     // 나무 조회
     public TreeResponseDto getTreeInfo(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Tree tree = treeRepository.findByUser(user)
-                .orElseThrow(() -> new IllegalArgumentException("트리 정보가 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         return new TreeResponseDto(tree);
     }
@@ -47,10 +49,10 @@ public class TreeService {
     // 물 주기
     public TreeResponseDto useWater(Long userId){
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Tree tree = treeRepository.findByUser(user)
-                .orElseThrow(() -> new IllegalArgumentException("트리 정보가 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         // 물이 0이면 예외 처리
         if (tree.getWater() <= 0) {
@@ -68,8 +70,7 @@ public class TreeService {
         return new TreeResponseDto(tree);
     }
 
-    /*
-    // 비료 주기
+    /* 비료 주기
     public TreeResponseDto useFertilizer(Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));

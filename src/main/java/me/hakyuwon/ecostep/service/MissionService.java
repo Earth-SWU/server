@@ -6,6 +6,8 @@ import me.hakyuwon.ecostep.dto.MissionDto;
 import me.hakyuwon.ecostep.dto.StepDataDto;
 import me.hakyuwon.ecostep.enums.BadgeType;
 import me.hakyuwon.ecostep.enums.MissionType;
+import me.hakyuwon.ecostep.exception.CustomException;
+import me.hakyuwon.ecostep.exception.ErrorCode;
 import me.hakyuwon.ecostep.repository.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MissionService {
 
     private final MissionRepository missionRepository;
@@ -38,7 +41,7 @@ public class MissionService {
     public List<MissionDto> getAllMissions(Long userId) {
         // 1. 사용자 조회
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 2. 전체 미션 목록 조회
         List<Mission> missions = missionRepository.findAll();
@@ -66,14 +69,13 @@ public class MissionService {
     }
 
     // 미션 완료
-    @Transactional
     public MissionDto.MissionBadgeResponseDto completeMission(Long userId, Long missionId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Mission mission = missionRepository.findById(missionId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 미션입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
         Tree tree = treeRepository.findByUser(user)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저의 트리가 존재하지 않음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         // 오늘 날짜의 시작 시간 (00:00)
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
@@ -110,12 +112,11 @@ public class MissionService {
     }
 
     // 출석 체크
-    @Transactional
     public String checkAttendance(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Mission mission = missionRepository.findByMissionType(MissionType.ATTENDANCE)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 미션입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         LocalDate today = LocalDate.now();
         boolean alreadyCompleted = userMissionRepository.existsByUserAndMissionAndCompletedAtAfter(user, mission, today.atStartOfDay());
@@ -127,12 +128,11 @@ public class MissionService {
     }
 
     // 걸음수
-    @Transactional
     public String checkSteps(StepDataDto stepDataDto) {
         User user = userRepository.findById(stepDataDto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Mission mission = missionRepository.findByMissionType(MissionType.WALK)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 미션입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         LocalDate today = LocalDate.now();
         boolean alreadyCompleted = userMissionRepository.existsByUserAndMissionAndCompletedAtAfter(user, mission, today.atStartOfDay());
@@ -146,13 +146,18 @@ public class MissionService {
         } else return "아직 걸음수가 모자라요!";
     }
 
-    @Transactional
+    // OX 퀴즈
+    public ResponseEntity<?> oxQuiz(){
+
+    }
+
+    // 뱃지 체크 및 부여
     public ResponseEntity<String> checkBadge(Long userId, Long missionId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Mission mission = missionRepository.findById(missionId)
-                .orElseThrow(() -> new RuntimeException("Mission not found"));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
         // 사용자가 해당 미션을 수행한 횟수를 조회
         long missionCount = userMissionRepository.countByUserAndMission(user, mission);
@@ -164,7 +169,7 @@ public class MissionService {
         if (missionCount >= badgeType.getRequiredCount()) {
             // 뱃지 중복 인증
             Badge badge = badgeRepository.findByName(mission.getMissionType().getBadgeName())
-                    .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 뱃지입니다."));
+                    .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
             if (userBadgeRepository.existsByUserAndBadge(user, badge)) {
                 return ResponseEntity.ok("이미 받은 뱃지입니다.");

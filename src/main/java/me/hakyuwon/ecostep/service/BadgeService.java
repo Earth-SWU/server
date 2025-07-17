@@ -5,6 +5,8 @@ import me.hakyuwon.ecostep.domain.Badge;
 import me.hakyuwon.ecostep.domain.User;
 import me.hakyuwon.ecostep.domain.UserBadge;
 import me.hakyuwon.ecostep.dto.BadgeDto;
+import me.hakyuwon.ecostep.exception.CustomException;
+import me.hakyuwon.ecostep.exception.ErrorCode;
 import me.hakyuwon.ecostep.repository.BadgeRepository;
 import me.hakyuwon.ecostep.repository.UserBadgeRepository;
 import me.hakyuwon.ecostep.repository.UserRepository;
@@ -23,7 +25,7 @@ public class BadgeService {
     public List<BadgeDto> getAllBadges(Long userId) {
         List<Badge> badges = badgeRepository.findAll();
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 사용자가 획득한 뱃지 목록 조회
         Set<Long> acquiredBadgeIds = userBadgeRepository.findByUser(user).stream()

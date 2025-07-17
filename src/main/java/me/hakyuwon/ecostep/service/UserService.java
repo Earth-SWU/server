@@ -8,6 +8,8 @@ import me.hakyuwon.ecostep.domain.UserBadge;
 import me.hakyuwon.ecostep.dto.UserDto;
 import me.hakyuwon.ecostep.dto.UserLoginRequest;
 import me.hakyuwon.ecostep.dto.UserSignUpRequest;
+import me.hakyuwon.ecostep.exception.CustomException;
+import me.hakyuwon.ecostep.exception.ErrorCode;
 import me.hakyuwon.ecostep.repository.BadgeRepository;
 import me.hakyuwon.ecostep.repository.TreeRepository;
 import me.hakyuwon.ecostep.repository.UserBadgeRepository;
@@ -42,11 +44,16 @@ public class UserService {
     public UserDto.UserSignupResponseDto signUp(UserSignUpRequest userDto) {
         // 이메일 중복 검증
         if (userRepository.existsByEmail(userDto.getEmail())){
-            throw new IllegalArgumentException("이미 등록된 이메일입니다.");}
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);}
 
         // 비밀번호 일치 확인
         if(!userDto.getPassword().equals(userDto.getConfirmPassword())){
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
+        }
+
+        // 핸드폰 번호 중복 확인
+        if(userRepository.existsByPhoneNumber(userDto.getPhoneNumber())){
+            throw new CustomException(ErrorCode.DUPLICATE_PHONE);
         }
 
         User newUser = userDto.toEntity();
@@ -74,9 +81,10 @@ public class UserService {
     // 로그인
     public UserDto.UserLoginResponseDto logIn(UserLoginRequest userDto){
         User user = userRepository.findByEmail(userDto.getEmail())
-                .orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+
         if (userDto.getPassword() == null || !bCryptPasswordEncoder.matches(userDto.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
+            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
         }
 
         String accessToken = tokenProvider.createToken(user.getEmail());
@@ -93,7 +101,7 @@ public class UserService {
     // 회원 탈퇴
     public void deleteUser(String email){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
 
         userRepository.delete(user);
     }
