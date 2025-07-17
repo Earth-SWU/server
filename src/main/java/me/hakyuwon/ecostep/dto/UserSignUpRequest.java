@@ -22,7 +22,7 @@ public class UserSignUpRequest {
     @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
     private String password;
 
-    @NotBlank
+    @NotBlank (message="비밀번호 중복 확인을 해 주세요")
     private String confirmPassword;
 
     @NotBlank(message="번호를 입력해 주세요")
