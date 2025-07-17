@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 @Entity
 @Getter
@@ -48,7 +47,6 @@ public class User extends BaseEntity implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
     }
-    // 특정 이메일이 관리자 역할을 가짐
 
     @Override
     public String getUsername() {
@@ -60,14 +58,12 @@ public class User extends BaseEntity implements UserDetails {
     }
 
     // 인증 사용자의 계정 유효 기간 정보를 반환
-    // false: 기간 만료
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
     // 인증 사용자의 계정 잠금 상태를 반환
-    // false: 잠금 상태
     @Override
     public boolean isAccountNonLocked() {
         return true;
@@ -80,14 +76,8 @@ public class User extends BaseEntity implements UserDetails {
         return true;
     }
 
-    // 인증 사용자의 활성화 상태를 반환
-    @Column(name = "enabled", nullable = false)
-    private Boolean enabled = true; // 기본값은 활성화(true)로 설정
-
-    // ... 나머지 코드
-
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return true;
     }
 }
