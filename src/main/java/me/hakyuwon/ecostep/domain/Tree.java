@@ -19,10 +19,10 @@ public class Tree extends BaseEntity {
     @Column(name = "tree_name", nullable = true)
     private String treeName;
 
-    @Column(name = "treeGrowth", nullable = false)
+    @Column(name = "tree_growth", nullable = false)
     private int treeGrowth; // 성장 퍼센트
 
-    @Column(name = "treeLevel", nullable = false)
+    @Column(name = "tree_level", nullable = false)
     private int treeLevel;
 
     @Column(name = "water", nullable = false)
