@@ -3,6 +3,8 @@ package me.hakyuwon.ecostep.service;
 import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.domain.User;
 import me.hakyuwon.ecostep.dto.UserDto;
+import me.hakyuwon.ecostep.exception.CustomException;
+import me.hakyuwon.ecostep.exception.ErrorCode;
 import me.hakyuwon.ecostep.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return user;
     }
