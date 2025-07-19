@@ -2,7 +2,6 @@ package me.hakyuwon.ecostep.service;
 
 import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.domain.User;
-import me.hakyuwon.ecostep.dto.UserDto;
 import me.hakyuwon.ecostep.exception.CustomException;
 import me.hakyuwon.ecostep.exception.ErrorCode;
 import me.hakyuwon.ecostep.repository.UserRepository;
