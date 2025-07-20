@@ -78,22 +78,17 @@ public class MissionController {
 
     // 영수증 인증 미션
     @PostMapping("/receipt")
-    public ResponseEntity<?> analyzeReceipt(@RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> analyzeReceipt(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) {
         try {
-            if (token.startsWith("Bearer ")) {
-                token = token.substring(7);
-            }
-            Claims claims = tokenProvider.getClaims(token); // 토큰에서 payload 추출
-            String email = claims.getSubject();
-
+            String email = userDetails.getUsername();
             User user = userRepository.findByEmail(email)
-                    .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
             String result = ocrService.analyzeReceipt(file);
-
             return ResponseEntity.ok(result);
+
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            throw new CustomException(ErrorCode.FILE_PROCESSING_FAILED);
         }
     }
 
