@@ -146,11 +146,6 @@ public class MissionService {
         } else return "아직 걸음수가 모자라요!";
     }
 
-    // OX 퀴즈
-    public ResponseEntity<?> oxQuiz(){
-
-    }
-
     // 뱃지 체크 및 부여
     public ResponseEntity<String> checkBadge(Long userId, Long missionId) {
 
