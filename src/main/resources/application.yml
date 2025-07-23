@@ -41,6 +41,3 @@ mail:
         timeout: 5000
         writetimeout: 5000
   auth-code-expiration-millis: 1800000
-
-server:
-  port: 80
