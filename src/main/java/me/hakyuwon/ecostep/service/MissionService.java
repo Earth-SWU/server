@@ -82,7 +82,9 @@ public class MissionService {
         double carbonReduction = mission.getCarbonReduction();
         String missionMessage;
 
-        boolean alreadyCompleted = userMissionRepository.existsByUserAndMissionAndCompletedAtAfter(user, mission, startOfDay);
+        boolean alreadyCompleted = false;
+
+        // boolean alreadyCompleted = userMissionRepository.existsByUserAndMissionAndCompletedAtAfter(user, mission, startOfDay);
         if (!alreadyCompleted) {
             // 미션 완료 기록 생성
             UserMission userMission = UserMission.builder()
