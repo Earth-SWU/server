@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,30 +44,24 @@ public class MissionService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // 2. 전체 미션 목록 조회
+        // 2. 전체 미션 목록
         List<Mission> missions = missionRepository.findAll();
 
-        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        // (원래는 오늘 날짜에 완료된 ID를 뽑지만)
+        // 테스트용: 빈 Set으로 만들어 항상 미완료 상태
+        Set<Long> completedMissionIds = Collections.emptySet();
 
-        // 4. 사용자 미션 기록 전체 조회
-        List<UserMission> userMissions = userMissionRepository.findByUser(user);
-
-        // 5. 오늘 완료한 미션 ID Set 생성 (completedAt의 날짜만 비교)
-        Set<Long> completedMissionIds = userMissions.stream()
-                .filter(um -> um.getCompletedAt().toLocalDate().isEqual(today)) // 오늘 날짜와 비교
-                .map(um -> um.getMission().getId())
-                .collect(Collectors.toSet());
-
-        // 6. 전체 미션을 순회하며 DTO에 오늘 달성 여부 설정
+        // 3. DTO 매핑 (항상 false)
         return missions.stream()
                 .map(mission -> new MissionDto(
                         mission.getId(),
                         mission.getMissionType(),
                         mission.getDescription(),
-                        completedMissionIds.contains(mission.getId()) // 오늘 달성 여부
+                        false  // 오늘 완료 여부를 무조건 false로 고정
                 ))
                 .collect(Collectors.toList());
     }
+
 
     // 미션 완료
     public MissionDto.MissionBadgeResponseDto completeMission(Long userId, Long missionId) {
