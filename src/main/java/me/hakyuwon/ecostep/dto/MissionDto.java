@@ -21,6 +21,10 @@ public class MissionDto {
         this.completed = completed;
     }
 
+    public MissionDto(MissionType missionType){
+        this.missionType = missionType;
+    }
+
     @Getter
     public static class MissionBadgeResponseDto{
         private long missionCount;

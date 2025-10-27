@@ -8,9 +8,11 @@ import java.util.Arrays;
 @Getter
 public enum MissionType {
     ATTENDANCE(1L, "출석 미션"),
-    RECEIPT(2L, "영수증 인증"),
-    TUMBLER(3L, "텀블러 사용"),
-    WALK(4L, "3000보 이상 걷기");
+    TUMBLER(2L, "텀블러 사용"),
+    WALK(3L, "5000보 이상 걷기"),
+    STAIR(4L, "계단 이용하기"),
+    OXQUIZ(5L, "ox 퀴즈 풀기"),
+    CHOICEQUIZ(6L, "객관식 퀴즈 풀기");
 
     private final Long missionId;
     private final String description;
@@ -32,11 +34,11 @@ public enum MissionType {
         switch (this) {
             case ATTENDANCE:
                 return BadgeType.ATTENDANCE_ECOSTEP;
-            case RECEIPT:
-                return BadgeType.RECEIPT_EXPERT;
             case TUMBLER:
                 return BadgeType.TUMBLER_MASTER;
             case WALK:
+                return BadgeType.WALKING_CHAMP;
+            case STAIR:
                 return BadgeType.WALKING_CHAMP;
             default:
                 throw new IllegalArgumentException("해당 미션에 맞는 뱃지가 존재하지 않습니다.");
@@ -47,12 +49,12 @@ public enum MissionType {
         switch (this) {
             case ATTENDANCE:
                 return "에코스텝러";
-            case RECEIPT:
-                return "영수증 분석 전문가";
             case TUMBLER:
                 return "텀블러 마스터";
             case WALK:
                 return "걷기 챔피언";
+            case STAIR:
+                return "계단 챔피언";
             default:
                 throw new IllegalArgumentException("해당 미션에 맞는 뱃지가 존재하지 않습니다.");
         }

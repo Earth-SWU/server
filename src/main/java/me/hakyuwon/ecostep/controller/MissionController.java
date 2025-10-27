@@ -35,25 +35,18 @@ public class MissionController {
     private final UserRepository userRepository;
     private final PredictModelService predictModelService;
 
-    private final String question = "텀블러 사용은 일회용 컵보다 탄소배출을 줄이는 데 도움이 된다.";
-    private final String correctAnswer = "O";
-    private final String explanation = "텀블러는 반복 사용이 가능하여 일회용 컵보다 훨씬 적은 탄소를 배출합니다.";
-
     // 미션 목록 조회
     @GetMapping("/{userId}")
     public ResponseEntity<Map<String, List<MissionDto>>> getMission(@PathVariable Long userId, @AuthenticationPrincipal UserDetails userDetails) {
-        // TODO: userId를 파라미터로 받을 필요 없음 (전체 로직 적용)
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        if (!user.getEmail().equals(userDetails.getUsername())) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
 
         List<MissionDto> missionDtos = missionService.getAllMissions(userId);
         Map<String, List<MissionDto>> response = new HashMap<>();
         response.put("missions", missionDtos);
         return ResponseEntity.ok(response);
     }
+
     // 미션 완료
     @PostMapping("/complete")
     public ResponseEntity<MissionDto.MissionBadgeResponseDto> completeMission(@RequestBody UserMissionDto userMissionDto, @AuthenticationPrincipal UserDetails userDetails) {
@@ -64,15 +57,23 @@ public class MissionController {
         return ResponseEntity.ok(response);
     }
 
-    // 출석 체크 미션
-    @GetMapping("/attend/{userId}")
-    public ResponseEntity<String> getAttendanceStatus(@PathVariable Long userId, @AuthenticationPrincipal UserDetails userDetails) {
-        User user = userRepository.findById(userId)
+    // 퀴즈 틀렸을 때
+    @PostMapping("/quiz/fail")
+    public ResponseEntity<String> failQuizMission(@RequestParam Long missionId, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        if (!user.getEmail().equals(userDetails.getUsername())) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
-        String result = missionService.checkAttendance(userId);
+
+        String message = missionService.failMission(user.getId(), missionId);
+        return ResponseEntity.ok(message);
+    }
+
+    // 출석 체크 미션
+    @GetMapping("/attend")
+    public ResponseEntity<String> getAttendanceStatus(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        String result = missionService.checkAttendance(user.getId());
         return ResponseEntity.ok(result);
     }
 
@@ -80,8 +81,7 @@ public class MissionController {
     @PostMapping("/receipt")
     public ResponseEntity<?> analyzeReceipt(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) {
         try {
-            String email = userDetails.getUsername();
-            User user = userRepository.findByEmail(email)
+            User user = userRepository.findByEmail(userDetails.getUsername())
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
             String result = ocrService.analyzeReceipt(file);
@@ -96,6 +96,9 @@ public class MissionController {
     @PostMapping("/tumbler")
     @ResponseBody
     public String checkMission(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         try {
             boolean success = predictModelService.isMissionSuccessful(file);
             return success ? "미션 성공!" : "미션 실패";
@@ -107,52 +110,35 @@ public class MissionController {
     // 3000보 이상 걷기
     @PostMapping("/walk")
     public ResponseEntity<String> walkMission(@RequestBody StepDataDto stepDto, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         String result = missionService.checkSteps(stepDto);
         return ResponseEntity.ok(result);
     }
 
     // 각 뱃지 지급 api
     @PostMapping("/badge/check")
-    public ResponseEntity<String> checkBadge(@RequestBody UserMissionDto userMissionDto, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<String> checkBadge(@RequestBody UserMissionDto userMissionDto, @AuthenticationPrincipal UserDetails userDetails) {
         try {
-            if (token.startsWith("Bearer ")) {
-                token = token.substring(7);
-            }
-            Claims claims = tokenProvider.getClaims(token); // 토큰에서 payload 추출
-            String email = claims.getSubject();
+            User user = userRepository.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-            User user1 = userRepository.findByEmail(email)
-                    .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-            User user2 = userRepository.findById(userMissionDto.getUserId())
-                    .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다. 2"));
-
-            // 요청된 userId와 인증된 userId가 일치하는지 검증
-            if (!user1.getId().equals(user2.getId())) {
-                throw new SecurityException("잘못된 접근입니다.");
-            }
-            return missionService.checkBadge(userMissionDto.getUserId(), userMissionDto.getMissionId());
+            return missionService.checkBadge(user.getId(), userMissionDto.getMissionId());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
     }
 
-    // ox 퀴즈 보여주기
-    @GetMapping("/quiz")
-    public ResponseEntity<OXQuizDto> getQuiz(@AuthenticationPrincipal UserDetails userDetails) {
-        OXQuizDto quiz = new OXQuizDto();
-        quiz.setQuestion(question);
-        quiz.setOptions(List.of("O"));
-        return ResponseEntity.ok(quiz);
-    }
+    // 계단 오르기 미션
+    @PostMapping("/stairs/complete")
+    public ResponseEntity<String> checkQr(@RequestBody QrMissionDto dto, @AuthenticationPrincipal UserDetails userDetails ){
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-    // ox 퀴즈 정답 제출
-    @PostMapping("/quiz/answer")
-    public ResponseEntity<OxQuizAnswerResponse> submitQuiz(@RequestBody OXQuizAnswerRequest request, @AuthenticationPrincipal UserDetails userDetails) {
-        boolean isCorrect = correctAnswer.equalsIgnoreCase(request.getUserAnswer());
-
-        OxQuizAnswerResponse response = new OxQuizAnswerResponse();
-        response.setCorrect(isCorrect);
-        response.setExplanation(explanation);
+        Long missionId = dto.getMissionId();
+        String request = dto.getQrString();
+        String response = missionService.checkStairs(user.getId(), missionId, request);
         return ResponseEntity.ok(response);
     }
 

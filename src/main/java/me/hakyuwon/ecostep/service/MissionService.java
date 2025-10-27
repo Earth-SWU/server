@@ -32,32 +32,27 @@ public class MissionService {
     private final TreeRepository treeRepository;
     private final UserBadgeRepository userBadgeRepository;
 
-    // 물 주는 미션 ID 목록
-    private static final Set<Long> WATER_MISSION_IDS = Set.of(1L, 2L, 3L, 4L);
-    // 비료 주는 미션 ID 목록
-    private static final Set<Long> FERTILIZER_MISSION_IDS = Set.of(5L);
+    // 물 주는 미션 ID 목록 (출석, 걷기, ox 퀴즈, 객관식 퀴즈)
+    private static final Set<Long> WATER_MISSION_IDS = Set.of(1L, 3L, 5L, 6L);
+    // 비료 주는 미션 ID 목록 (계단, 텀블러)
+    private static final Set<Long> FERTILIZER_MISSION_IDS = Set.of(2L, 4L);
+    private static final String QR_AUTHENTICATION_CODE = "STAIRMISSION_001_2025";
     private final BadgeRepository badgeRepository;
 
     // 미션 목록 조회
     public List<MissionDto> getAllMissions(Long userId) {
-        // 1. 사용자 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // 2. 전체 미션 목록
         List<Mission> missions = missionRepository.findAll();
-
-        // (원래는 오늘 날짜에 완료된 ID를 뽑지만)
-        // 테스트용: 빈 Set으로 만들어 항상 미완료 상태
         Set<Long> completedMissionIds = Collections.emptySet();
 
-        // 3. DTO 매핑 (항상 false)
         return missions.stream()
                 .map(mission -> new MissionDto(
                         mission.getId(),
                         mission.getMissionType(),
                         mission.getDescription(),
-                        false  // 오늘 완료 여부를 무조건 false로 고정
+                        false
                 ))
                 .collect(Collectors.toList());
     }
@@ -72,7 +67,6 @@ public class MissionService {
         Tree tree = treeRepository.findByUser(user)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
-        // 오늘 날짜의 시작 시간 (00:00)
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         double carbonReduction = mission.getCarbonReduction();
         String missionMessage;
@@ -89,7 +83,6 @@ public class MissionService {
                     .completedAt(LocalDateTime.now())
                     .build();
 
-            // 미션 유형에 따른 트리 업데이트
             if (WATER_MISSION_IDS.contains(missionId)) {
                 tree.applyItems(1, 0);
             } else if (FERTILIZER_MISSION_IDS.contains(missionId)) {
@@ -103,9 +96,36 @@ public class MissionService {
             missionMessage = "이미 완료한 미션입니다.";
         }
 
-        // 해당 미션 수행 횟수 조회
         long missionCount = userMissionRepository.countByUserAndMission(user, mission);
         return new MissionDto.MissionBadgeResponseDto(missionCount, missionMessage);
+    }
+
+    // 미션 실패 (퀴즈용)
+    public String failMission(Long userId, Long missionId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Mission mission = missionRepository.findById(missionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+        Tree tree = treeRepository.findByUser(user)
+                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        boolean alreadyCompleted = false;
+        if (!alreadyCompleted) {
+            // 미션 완료 기록 생성
+            UserMission userMission = UserMission.builder()
+                    .user(user)
+                    .mission(mission)
+                    .carbonReduction(0)
+                    .completedAt(LocalDateTime.now())
+                    .build();
+
+            userMissionRepository.save(userMission);
+            treeRepository.save(tree);
+
+            return "미션에 실패했습니다. 다음 기회에 도전해주세요.";
+        } else {
+            return "이미 완료한 미션입니다.";
+        }
     }
 
     // 출석 체크
@@ -139,7 +159,7 @@ public class MissionService {
             if (alreadyCompleted) {
                 return "이미 걸음수 체크를 했어요.";
             }
-            return "3000보 이상 걷고, 물 받아요!";
+            return "5000보 이상 걷고, 물 받아요!";
         } else return "아직 걸음수가 모자라요!";
     }
 
@@ -180,5 +200,17 @@ public class MissionService {
             }
         }
             return ResponseEntity.ok("뱃지 지급 조건을 충족하지 않았습니다.");
+    }
+
+    // 계단 오르기 -> qr 인증 미션
+    public String checkStairs(Long userId, Long missionId, String qrCodeString) {
+        if(!missionId.equals(4L)){
+            throw new CustomException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
+        if (!QR_AUTHENTICATION_CODE.equals(qrCodeString)) {
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+
+        return "QR 인증이 완료되었습니다.";
     }
 }
