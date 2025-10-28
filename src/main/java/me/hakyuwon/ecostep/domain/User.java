@@ -29,6 +29,12 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
 
+    @Column (name="nickname", nullable = false)
+    private String nickname;
+
+    @Column (name = "major", nullable = false)
+    private String major;
+
     @Column(name = "reward", nullable = false)
     private Boolean reward = false;
 
@@ -36,10 +42,12 @@ public class User extends BaseEntity implements UserDetails {
     private Tree tree;
 
     @Builder
-    public User(String email, String password, String phoneNumber) {
+    public User(String email, String password, String phoneNumber, String nickname, String major) {
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
+        this.nickname = nickname;
+        this.major = major;
     }
 
     @Override
