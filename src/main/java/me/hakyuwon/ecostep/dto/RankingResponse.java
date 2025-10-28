@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class RankingResponse {
     private int rank;
     private String treeName;
+    private String major;
     private int treeLevel;
     private double growth;
 }
