@@ -63,6 +63,7 @@ public class UserService {
 
         // Tree 객체 생성
         Tree tree = new Tree();
+        tree.setTreeName(newUser.getNickname());
         tree.setUser(newUser);
         tree.setTreeLevel(1);
         tree.setTreeGrowth(0);
