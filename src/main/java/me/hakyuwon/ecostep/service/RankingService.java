@@ -2,7 +2,6 @@ package me.hakyuwon.ecostep.service;
 
 import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.domain.Tree;
-import me.hakyuwon.ecostep.domain.User;
 import me.hakyuwon.ecostep.dto.RankingResponse;
 import me.hakyuwon.ecostep.repository.TreeRepository;
 import me.hakyuwon.ecostep.repository.UserRepository;
