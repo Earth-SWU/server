@@ -58,8 +58,8 @@ public class MissionController {
     }
 
     // 퀴즈 틀렸을 때
-    @PostMapping("/quiz/fail")
-    public ResponseEntity<String> failQuizMission(@RequestParam Long missionId, @AuthenticationPrincipal UserDetails userDetails) {
+    @PostMapping("/quiz/fail/{missionId}")
+    public ResponseEntity<String> failQuizMission(@PathVariable Long missionId, @AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -77,7 +77,7 @@ public class MissionController {
         return ResponseEntity.ok(result);
     }
 
-    // 영수증 인증 미션
+    /* 영수증 인증 미션
     @PostMapping("/receipt")
     public ResponseEntity<?> analyzeReceipt(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) {
         try {
@@ -90,7 +90,7 @@ public class MissionController {
         } catch (Exception e) {
             throw new CustomException(ErrorCode.FILE_PROCESSING_FAILED);
         }
-    }
+    }*/
 
     // 텀블러 사용 미션
     @PostMapping("/tumbler")
@@ -107,7 +107,7 @@ public class MissionController {
         }
     }
 
-    // 3000보 이상 걷기
+    // 5000보 이상 걷기
     @PostMapping("/walk")
     public ResponseEntity<String> walkMission(@RequestBody StepDataDto stepDto, @AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername())

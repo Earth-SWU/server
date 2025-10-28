@@ -15,8 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,15 +43,25 @@ public class MissionService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<Mission> missions = missionRepository.findAll();
-        Set<Long> completedMissionIds = Collections.emptySet();
+        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
+
+        Set<Long> completedMissionIds = userMissionRepository
+                .findByUserAndCompletedAtAfter(user, startOfToday)
+                .stream()
+                .map(userMission -> userMission.getMission().getId())
+                .collect(Collectors.toSet());
 
         return missions.stream()
-                .map(mission -> new MissionDto(
-                        mission.getId(),
-                        mission.getMissionType(),
-                        mission.getDescription(),
-                        false
-                ))
+                .map(mission -> {
+                    boolean isCompleted = completedMissionIds.contains(mission.getId());
+
+                    return new MissionDto(
+                            mission.getId(),
+                            mission.getMissionType(),
+                            mission.getDescription(),
+                            isCompleted
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
@@ -120,7 +128,6 @@ public class MissionService {
                     .build();
 
             userMissionRepository.save(userMission);
-            treeRepository.save(tree);
 
             return "미션에 실패했습니다. 다음 기회에 도전해주세요.";
         } else {
@@ -155,7 +162,7 @@ public class MissionService {
         boolean alreadyCompleted = userMissionRepository.existsByUserAndMissionAndCompletedAtAfter(user, mission, today.atStartOfDay());
 
         int step = stepDataDto.getSteps();
-        if (step >= 3000) {
+        if (step >= 5000) {
             if (alreadyCompleted) {
                 return "이미 걸음수 체크를 했어요.";
             }
