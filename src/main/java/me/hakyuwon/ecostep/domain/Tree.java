@@ -35,8 +35,8 @@ public class Tree extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private static final int WATER_GROWTH = 15;  // 물 1개당 성장 %
-    private static final int FERTILIZER_GROWTH = 30;  // 비료 1개당 성장 %
+    private static final int WATER_GROWTH = 5;  // 물 1개당 성장 %
+    private static final int FERTILIZER_GROWTH = 10;  // 비료 1개당 성장 %
 
     public void applyItems(int waterGain, int fertilizerGain) {
         this.water += waterGain;

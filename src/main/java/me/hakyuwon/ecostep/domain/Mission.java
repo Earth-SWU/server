@@ -31,4 +31,7 @@ public class Mission {
     @Column(name ="mission_water",nullable = false)
     private int mission_water;
 
+    @Column(name = "mission_fert", nullable = false)
+    private int mission_fert;
+
 }

@@ -63,8 +63,8 @@ public class UserService {
 
         // Tree 객체 생성
         Tree tree = new Tree();
-        tree.setUser(newUser);  // Tree와 User 연결
-        tree.setTreeLevel(1);    // 트리의 초기 설정
+        tree.setUser(newUser);
+        tree.setTreeLevel(1);
         tree.setTreeGrowth(0);
         tree.setWater(0);
 

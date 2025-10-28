@@ -60,7 +60,7 @@ public class TreeService {
         }
 
         int water = 1;
-        int growth = 15;
+        int growth = 5;
 
         tree.setWater(tree.getWater() - water); // 물 1개 차감
         tree.setTreeGrowth(tree.getTreeGrowth() + growth);
@@ -70,7 +70,7 @@ public class TreeService {
         return new TreeResponseDto(tree);
     }
 
-    /* 비료 주기
+    // 비료 주기
     public TreeResponseDto useFertilizer(Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
@@ -79,14 +79,14 @@ public class TreeService {
                 .orElseThrow(() -> new IllegalArgumentException("트리 정보가 없습니다."));
 
         int fert = 1;
-        int growth = 30;
+        int growth = 10;
 
-        tree.setFertilizer(tree.getFertilizer() - fert); // 물 1개 차감
-        tree.setGrowth(tree.getGrowth() + growth);
+        tree.setFertilizer(tree.getFertilizer() - fert); // 비료 1개 차감
+        tree.setTreeGrowth(tree.getTreeGrowth() + growth);
         checkLevelUp(tree);
 
         return new TreeResponseDto(tree);
-    }*/
+    }
 
     private void checkLevelUp(Tree tree) {
         while (tree.getTreeGrowth() >= 100) {
