@@ -21,20 +21,6 @@ public class TreeService {
         this.userRepository = userRepository;
     }
 
-    public TreeResponseDto setTreeName(Long userId, String name) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        Tree tree = treeRepository.findByUser(user)
-                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
-
-        tree.setTreeName(name);
-        treeRepository.save(tree);
-        user.setTree(tree);
-
-        return new TreeResponseDto(tree);
-    }
-
     // 나무 조회
     public TreeResponseDto getTreeInfo(Long userId) {
         User user = userRepository.findById(userId)

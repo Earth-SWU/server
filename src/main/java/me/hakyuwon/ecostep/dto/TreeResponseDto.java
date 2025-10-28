@@ -12,6 +12,7 @@ public class TreeResponseDto {
     private int level;
     private int growth;
     private int water;
+    private int fert;
 
     public TreeResponseDto(Tree tree) {
         this.id = tree.getId();
@@ -19,5 +20,6 @@ public class TreeResponseDto {
         this.level = tree.getTreeLevel();
         this.growth = tree.getTreeGrowth();
         this.water = tree.getWater();
+        this.fert = tree.getFertilizer();
     }
 }
