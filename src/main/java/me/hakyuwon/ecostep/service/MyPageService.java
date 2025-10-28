@@ -10,12 +10,12 @@ import me.hakyuwon.ecostep.exception.ErrorCode;
 import me.hakyuwon.ecostep.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,16 +26,14 @@ import java.util.stream.Collectors;
 public class MyPageService {
     private final UserRepository userRepository;
     private final UserMissionRepository userMissionRepository;
-    private final MissionRepository missionRepository;
     private final TreeRepository treeRepository;
     private final UserBadgeRepository userBadgeRepository;
 
     @Transactional
-    public MyPageDto getMyPage(@PathVariable Long userId) {
+    public MyPageDto getMyPage(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // user 트리네임 겟, 뱃지 개수, 미션 수행 개수, 나무레벨 겟
         Tree tree = treeRepository.findByUser(user)
                 .orElseThrow(()-> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
@@ -43,12 +41,14 @@ public class MyPageService {
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.atTime(23, 59, 59);
 
-        String treeName = tree.getTreeName();
-        int badgeCount = userBadgeRepository.countByUser(user);
+        LocalDate signupDate = user.getCreatedAt().toLocalDate(); // User의 가입일
+
+        long startDays = ChronoUnit.DAYS.between(signupDate, today) + 1;
+        String nickname = user.getNickname();
         int missionCount = userMissionRepository.countByUserAndCompletedAtBetween(user, startOfDay, endOfDay);
         int treeLevel = tree.getTreeLevel();
 
-        ProfileDto profile = new ProfileDto(treeName, badgeCount, missionCount, treeLevel);
+        ProfileDto profile = new ProfileDto(nickname, missionCount, treeLevel, (int) startDays);
 
         // 탄소 감축량 통계 조회
         List<UserMission> userMissions = userMissionRepository.findByUser(user);
@@ -57,11 +57,16 @@ public class MyPageService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         CarbonStatsDto carbonStats = new CarbonStatsDto(userId, totalReduction);
 
-        // 이번 달 미션 달성률 조회
-        LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
-        LocalDateTime startOfMonth = firstDayOfMonth.atStartOfDay();
+        // 이번 주 미션 달성률 조회
+        LocalDate firstDayOfWeek = today.with(java.time.DayOfWeek.MONDAY);
+        LocalDateTime startOfWeek = firstDayOfWeek.atStartOfDay();
 
-        List<UserMission> eachMissions = userMissionRepository.findByUserAndCompletedAtAfter(user, startOfMonth);
+        // 이번 주 끝 (일요일 23:59:59)
+        LocalDate lastDayOfWeek = firstDayOfWeek.plusDays(6);
+        LocalDateTime endOfWeek = lastDayOfWeek.atTime(23, 59, 59);
+
+        List<UserMission> eachMissions = userMissionRepository
+                .findByUserAndCompletedAtBetween(user, startOfWeek, endOfWeek);
         long totalMissions = eachMissions.size();
 
         // 미션 타입과 각각의 횟수가 저장됨
@@ -88,20 +93,18 @@ public class MyPageService {
                 }
             }
 
-            // 소수점 오차 보정: 총합이 100이 아닐 경우, 가장 큰 비율의 미션에 차이를 더함
             double diff = 100.0 - sumPercentage;
             if (maxKey != null) {
                 missionPercentages.put(maxKey, missionPercentages.get(maxKey) + diff);
             }
         } else {
-            // 미션을 하나도 수행하지 않았을 경우 모든 타입에 대해 0%로 처리
             missionCounts.keySet().forEach(key -> missionPercentages.put(key, 0.0));
         }
 
         MissionProgressDto missionProgress = new MissionProgressDto(
                 userId,
                 totalMissions,
-                missionPercentages.size(), // 이 값은 미션 타입의 개수를 나타냅니다.
+                missionPercentages.size(),
                 missionPercentages
         );
 
@@ -109,10 +112,9 @@ public class MyPageService {
     }
 
     @Transactional
-    public ProfileDto getProfile(@PathVariable Long userId) {
+    public ProfileDto getProfile(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        // user 트리네임 겟, 뱃지 개수, 미션 수행 개수, 나무레벨 겟
         Tree tree = treeRepository.findByUser(user)
                 .orElseThrow(()-> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
@@ -120,16 +122,28 @@ public class MyPageService {
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
 
-        String treeName = tree.getTreeName();
-        int badgeCount = userBadgeRepository.countByUser(user);
+        String nickName = user.getNickname();
         int missionCount = userMissionRepository.countByUserAndCompletedAtBetween(user, startOfDay, endOfDay);
         int treeLevel = tree.getTreeLevel();
+        long startDays = ChronoUnit.DAYS.between(startOfDay, today)+ 1;
 
         return ProfileDto.builder()
-                .treeName(treeName)
-                .badgeCount(badgeCount)
+                .nickName(nickName)
                 .missionCount(missionCount)
                 .treeLevel(treeLevel)
+                .startDays((int) startDays)
+                .build();
+    }
+
+    // 숲을 시작한 지 몇 일~
+    public ForestDaysResponse getDays(User user){
+        LocalDate signupDate = user.getCreatedAt().toLocalDate();
+        LocalDate today = LocalDate.now();
+
+        long days = ChronoUnit.DAYS.between(signupDate, today) + 1;
+
+        return ForestDaysResponse.builder()
+                .days((int) days)
                 .build();
     }
 }
