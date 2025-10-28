@@ -40,7 +40,7 @@ public class UserService {
         this.badgeRepository = badgeRepository;
     }
 
-    // user 엔티티 객체 생성, 저장 (회원가입)
+    // 회원가입
     public UserDto.UserSignupResponseDto signUp(UserSignUpRequest userDto) {
         // 이메일 중복 검증
         if (userRepository.existsByEmail(userDto.getEmail())){
@@ -61,7 +61,7 @@ public class UserService {
         // 비밀번호 암호화 후 저장
         newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
 
-        // Tree 객체 생성
+        // 나무 객체 생성
         Tree tree = new Tree();
         tree.setTreeName(newUser.getNickname());
         tree.setUser(newUser);
@@ -91,12 +91,37 @@ public class UserService {
         String accessToken = tokenProvider.createToken(user.getEmail());
         String refreshToken = tokenProvider.createRefreshToken(user.getEmail());
 
+        user.setRefreshToken(refreshToken); // User 엔티티에 토큰 저장
+        userRepository.save(user);
+
         return UserDto.UserLoginResponseDto.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    // 로그아웃
+    public void logout(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        user.setRefreshToken(null);
+        userRepository.save(user);
+    }
+
+    // 로그아웃 후 토큰 검증
+    public void validateAndRevokeRefresh(String email, String clientRefreshToken) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.getRefreshToken() == null) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN); // 이미 로그아웃됨
+        }
+
+        if (!user.getRefreshToken().equals(clientRefreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN); // 토큰 불일치
+        }
     }
 
     // 회원 탈퇴

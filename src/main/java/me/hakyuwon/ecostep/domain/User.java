@@ -38,6 +38,9 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "reward", nullable = false)
     private Boolean reward = false;
 
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Tree tree;
 

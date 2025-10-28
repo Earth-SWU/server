@@ -52,6 +52,15 @@ public class UserController {
         return ResponseEntity.ok(userService.logIn(request));
     }
 
+    // 로그아웃
+    @PostMapping("/api/users/logout")
+    public ResponseEntity<String> logout(@AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        userService.logout(email);
+
+        return ResponseEntity.ok("로그아웃 성공");
+    }
+
     // 회원 탈퇴
     @DeleteMapping("/api/users/delete")
     public ResponseEntity<String> deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
@@ -98,9 +107,11 @@ public class UserController {
     public ResponseEntity<Map<String, String>> refreshAccessToken(@RequestBody Map<String, String> refreshTokenRequest) {
         String refreshToken = refreshTokenRequest.get("refreshToken");
 
-        if (refreshToken == null || !tokenProvider.validateRefreshToken(refreshToken)) {
+        if (refreshToken == null) {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
+        String email = tokenProvider.extractUserEmail(refreshToken);
+        userService.validateAndRevokeRefresh(email, refreshToken);
 
         // 리프레시 토큰으로 새로운 액세스 토큰 발급
         String newAccessToken = tokenProvider.generateAccessTokenFromRefresh(refreshToken);
