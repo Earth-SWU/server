@@ -64,12 +64,17 @@ public class TreeService {
         Tree tree = treeRepository.findByUser(user)
                 .orElseThrow(() -> new IllegalArgumentException("트리 정보가 없습니다."));
 
+        if (tree.getFertilizer() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비료가 부족해요!");
+        }
+
         int fert = 1;
         int growth = 10;
 
         tree.setFertilizer(tree.getFertilizer() - fert); // 비료 1개 차감
         tree.setTreeGrowth(tree.getTreeGrowth() + growth);
         checkLevelUp(tree);
+        treeRepository.save(tree);
 
         return new TreeResponseDto(tree);
     }
