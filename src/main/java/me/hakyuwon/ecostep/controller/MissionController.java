@@ -138,8 +138,17 @@ public class MissionController {
 
         Long missionId = dto.getMissionId();
         String request = dto.getQrString();
-        String response = missionService.checkStairs(user.getId(), missionId, request);
+        String response = missionService.checkStairs(missionId, request);
         return ResponseEntity.ok(response);
     }
 
+    // 환경 일기 쓰기 미션
+    @PostMapping("/eco-diary/complete")
+    public ResponseEntity<String> writeDiary(@RequestBody DiaryDto dto, @AuthenticationPrincipal UserDetails userDetails ){
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Long missionId = dto.getMissionId();
+        return missionService.keepEcoDiary(user.getId(),missionId, dto);
+    }
 }

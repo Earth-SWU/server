@@ -2,6 +2,7 @@ package me.hakyuwon.ecostep.service;
 
 import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.domain.*;
+import me.hakyuwon.ecostep.dto.DiaryDto;
 import me.hakyuwon.ecostep.dto.MissionDto;
 import me.hakyuwon.ecostep.dto.StepDataDto;
 import me.hakyuwon.ecostep.enums.BadgeType;
@@ -29,11 +30,12 @@ public class MissionService {
     private final UserRepository userRepository;
     private final TreeRepository treeRepository;
     private final UserBadgeRepository userBadgeRepository;
+    private final EcoDiaryRepository ecoDiaryRepository;
 
     // 물 주는 미션 ID 목록 (출석, 걷기, ox 퀴즈, 객관식 퀴즈)
     private static final Set<Long> WATER_MISSION_IDS = Set.of(1L, 3L, 5L, 6L);
     // 비료 주는 미션 ID 목록 (계단, 텀블러)
-    private static final Set<Long> FERTILIZER_MISSION_IDS = Set.of(2L, 4L);
+    private static final Set<Long> FERTILIZER_MISSION_IDS = Set.of(2L, 4L, 7l);
     private static final String QR_AUTHENTICATION_CODE = "STAIRMISSION_001_2025";
     private final BadgeRepository badgeRepository;
 
@@ -79,9 +81,7 @@ public class MissionService {
         double carbonReduction = mission.getCarbonReduction();
         String missionMessage;
 
-        boolean alreadyCompleted = false;
-
-        // boolean alreadyCompleted = userMissionRepository.existsByUserAndMissionAndCompletedAtAfter(user, mission, startOfDay);
+        boolean alreadyCompleted = userMissionRepository.existsByUserAndMissionAndCompletedAtAfter(user, mission, startOfDay);
         if (!alreadyCompleted) {
             // 미션 완료 기록 생성
             UserMission userMission = UserMission.builder()
@@ -117,7 +117,10 @@ public class MissionService {
         Tree tree = treeRepository.findByUser(user)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
-        boolean alreadyCompleted = false;
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+
+        boolean alreadyCompleted = userMissionRepository.existsByUserAndMissionAndCompletedAtAfter(user, mission, startOfDay);
+
         if (!alreadyCompleted) {
             // 미션 완료 기록 생성
             UserMission userMission = UserMission.builder()
@@ -210,7 +213,7 @@ public class MissionService {
     }
 
     // 계단 오르기 -> qr 인증 미션
-    public String checkStairs(Long userId, Long missionId, String qrCodeString) {
+    public String checkStairs(Long missionId, String qrCodeString) {
         if(!missionId.equals(4L)){
             throw new CustomException(ErrorCode.RESOURCE_NOT_FOUND);
         }
@@ -219,5 +222,33 @@ public class MissionService {
         }
 
         return "QR 인증이 완료되었습니다.";
+    }
+
+    // 환경 일기 미션
+    public ResponseEntity<String> keepEcoDiary(Long userId, Long missionId, DiaryDto dto) {
+        if(!missionId.equals(7L)){
+            throw new CustomException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        String content = dto.getContent();
+        LocalDate today = LocalDate.now();
+
+        boolean alreadyWrote = ecoDiaryRepository.existsByUserAndDate(user, today);
+        if (alreadyWrote) {
+            return ResponseEntity.ok("오늘 이미 환경 일기를 작성하였습니다.");
+        }
+
+        EcoDiary ecoDiary = new EcoDiary();
+        ecoDiary.setContent(content);
+        ecoDiary.setUser(user);
+        ecoDiary.setDate(today);
+        ecoDiaryRepository.save(ecoDiary);
+
+        MissionDto.MissionBadgeResponseDto missionResult = completeMission(userId, missionId);
+        String responseMessage = missionResult.getMissionMessage();
+        return ResponseEntity.ok(responseMessage);
     }
 }

@@ -12,7 +12,8 @@ public enum MissionType {
     WALK(3L, "5000보 이상 걷기"),
     STAIR(4L, "계단 이용하기"),
     OXQUIZ(5L, "ox 퀴즈 풀기"),
-    CHOICEQUIZ(6L, "객관식 퀴즈 풀기");
+    CHOICEQUIZ(6L, "객관식 퀴즈 풀기"),
+    ECODIARY(7L,"환경 일기 쓰기");
 
     private final Long missionId;
     private final String description;
