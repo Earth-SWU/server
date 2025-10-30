@@ -113,7 +113,7 @@ public class MissionController {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        String result = missionService.checkSteps(stepDto);
+        String result = missionService.checkSteps(stepDto, user);
         return ResponseEntity.ok(result);
     }
 

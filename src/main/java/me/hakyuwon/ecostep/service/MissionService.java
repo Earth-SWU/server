@@ -155,9 +155,8 @@ public class MissionService {
     }
 
     // 걸음수
-    public String checkSteps(StepDataDto stepDataDto) {
-        User user = userRepository.findById(stepDataDto.getUserId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    public String checkSteps(StepDataDto stepDataDto, User user) {
+
         Mission mission = missionRepository.findByMissionType(MissionType.WALK)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
