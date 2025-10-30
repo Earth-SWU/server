@@ -45,8 +45,9 @@ public class MissionService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        ZoneId koreaZone = ZoneId.of("Asia/Seoul");
         List<Mission> missions = missionRepository.findAll();
-        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
+        LocalDateTime startOfToday = LocalDate.now(koreaZone).atStartOfDay();
 
         Set<Long> completedMissionIds = userMissionRepository
                 .findByUserAndCompletedAtAfter(user, startOfToday)
