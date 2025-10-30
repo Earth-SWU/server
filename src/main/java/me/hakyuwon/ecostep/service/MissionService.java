@@ -120,7 +120,8 @@ public class MissionService {
         Tree tree = treeRepository.findByUser(user)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        ZoneId koreaZone = ZoneId.of("Asia/Seoul");
+        LocalDateTime startOfDay = LocalDate.now(koreaZone).atStartOfDay();
 
         boolean alreadyCompleted = userMissionRepository.existsByUserAndMissionAndCompletedAtAfter(user, mission, startOfDay);
 
@@ -130,7 +131,7 @@ public class MissionService {
                     .user(user)
                     .mission(mission)
                     .carbonReduction(0)
-                    .completedAt(LocalDateTime.now())
+                    .completedAt(LocalDateTime.now(koreaZone))
                     .build();
 
             userMissionRepository.save(userMission);
@@ -235,8 +236,9 @@ public class MissionService {
         User user = userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        ZoneId koreaZone = ZoneId.of("Asia/Seoul");
         String content = dto.getContent();
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(koreaZone);
 
         boolean alreadyWrote = ecoDiaryRepository.existsByUserAndDate(user, today);
         if (alreadyWrote) {
