@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -77,7 +78,8 @@ public class MissionService {
         Tree tree = treeRepository.findByUser(user)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        ZoneId koreaZone = ZoneId.of("Asia/Seoul");
+        LocalDateTime startOfDay = LocalDate.now(koreaZone).atStartOfDay();
         double carbonReduction = mission.getCarbonReduction();
         String missionMessage;
 
@@ -88,7 +90,7 @@ public class MissionService {
                     .user(user)
                     .mission(mission)
                     .carbonReduction(carbonReduction)
-                    .completedAt(LocalDateTime.now())
+                    .completedAt(LocalDateTime.now(koreaZone))
                     .build();
 
             if (WATER_MISSION_IDS.contains(missionId)) {
