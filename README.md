@@ -3,7 +3,7 @@
 
 # 🌿 EcoStep — Server
 
-> **Come together, Make greener.**
+> **Come together, Make greener.** \n
 > A backend server for EcoStep, a mobile app that visualizes eco-friendly daily actions through a virtual tree-growing simulation.
 
 ---
@@ -16,7 +16,7 @@
 <img width="4000" height="2250" alt="PitchDeck_EarthSWU_page-0010" src="https://github.com/user-attachments/assets/441adc70-bc01-4035-8b5c-99c68ed53354" />
 
 
-EcoStep bridges university students and their institutions by making environmental action simple, rewarding, and visible. Students complete daily eco-missions (using a tumbler, taking public transport, zero-waste meals, etc.), earn campus mileage rewards, and watch a virtual tree grow as their impact accumulates.
+**EcoStep** bridges university students and their institutions by making environmental action simple, rewarding, and visible. Students complete daily eco-missions (using a tumbler, taking public transport, zero-waste meals, etc.), earn campus mileage rewards, and watch a virtual tree grow as their impact accumulates.
 
 ---
 
