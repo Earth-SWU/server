@@ -3,10 +3,10 @@
 
 # 🌿 EcoStep — Server
 
-> **Come together, Make greener.** \n
+> **Come together, Make greener.**<br/>
 > A backend server for EcoStep, a mobile app that visualizes eco-friendly daily actions through a virtual tree-growing simulation.
 
----
+<br/>
 
 ## 📖 About the Project
 
@@ -18,7 +18,7 @@
 
 **EcoStep** bridges university students and their institutions by making environmental action simple, rewarding, and visible. Students complete daily eco-missions (using a tumbler, taking public transport, zero-waste meals, etc.), earn campus mileage rewards, and watch a virtual tree grow as their impact accumulates.
 
----
+<br/>
 
 ## 🛠️ Tech Stack
 
@@ -30,7 +30,7 @@
 ![Gradle](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white)
 ![Lombok](https://img.shields.io/badge/Lombok-BC4521?style=for-the-badge&logoColor=white)
 
----
+<br/>
 
 ## ✨ My Role
 
