@@ -10,6 +10,9 @@
 
 ## 📖 About the Project
 
+<img width="4000" height="2250" alt="PitchDeck_EarthSWU_page-0011" src="https://github.com/user-attachments/assets/f59aa2a5-f35e-4a97-8764-8616f43d1ff5" />
+
+
 EcoStep bridges university students and their institutions by making environmental action simple, rewarding, and visible. Students complete daily eco-missions (using a tumbler, taking public transport, zero-waste meals, etc.), earn campus mileage rewards, and watch a virtual tree grow as their impact accumulates.
 
 ---
