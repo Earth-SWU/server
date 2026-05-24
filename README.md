@@ -39,6 +39,6 @@ I was responsible for the **backend server**, including:
 - RESTful API design and implementation with Spring Boot
 - JWT-based authentication and authorization via Spring Security
 - Database modeling and persistence with Spring Data JPA + MySQL
-- Server deployment and infrastructure setup
+- Server deployment and management on AWS (EC2)
 
 
