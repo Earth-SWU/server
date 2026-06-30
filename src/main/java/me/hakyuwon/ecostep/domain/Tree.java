@@ -1,14 +1,14 @@
 package me.hakyuwon.ecostep.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
-
-import java.math.BigDecimal;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="tree")
 public class Tree extends BaseEntity {
     @Id
@@ -38,9 +38,21 @@ public class Tree extends BaseEntity {
     private static final int WATER_GROWTH = 5;  // 물 1개당 성장 %
     private static final int FERTILIZER_GROWTH = 10;  // 비료 1개당 성장 %
 
+    @Builder
+    public Tree(String treeName, int treeGrowth, int treeLevel, int water, int fertilizer) {
+        this.treeName = treeName;
+        this.treeGrowth = treeGrowth;
+        this.treeLevel = treeLevel;
+        this.water = water;
+        this.fertilizer = fertilizer;
+    }
+
     public void applyItems(int waterGain, int fertilizerGain) {
         this.water += waterGain;
         this.fertilizer += fertilizerGain;
     }
 
+    public void setUserInternal(User user) {
+        this.user = user;
+    }
 }
