@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.hakyuwon.ecostep.domain.User;
+import me.hakyuwon.ecostep.exception.CustomException;
+import me.hakyuwon.ecostep.exception.ErrorCode;
 
 @Getter
 @NoArgsConstructor
@@ -45,5 +47,10 @@ public class UserSignUpRequest {
                 .nickname(this.nickname)
                 .major(this.major)
                 .build();
+    }
+
+    public void validatePassword(){
+        if(!this.password.equals(this.confirmPassword))
+            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
     }
 }
