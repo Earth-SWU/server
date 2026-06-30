@@ -25,15 +25,13 @@ import java.time.LocalDate;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
-    private final TreeRepository treeRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final TokenProvider tokenProvider;
     private final UserBadgeRepository userBadgeRepository;
     private final BadgeRepository badgeRepository;
 
-    public UserService(UserRepository userRepository, TreeRepository treeRepository, BCryptPasswordEncoder bCryptPasswordEncoder, TokenProvider tokenProvider, UserBadgeRepository userBadgeRepository, BadgeRepository badgeRepository) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, TokenProvider tokenProvider, UserBadgeRepository userBadgeRepository, BadgeRepository badgeRepository) {
         this.userRepository = userRepository;
-        this.treeRepository = treeRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.tokenProvider = tokenProvider;
         this.userBadgeRepository = userBadgeRepository;
@@ -41,36 +39,32 @@ public class UserService {
     }
 
     // 회원가입
-    public UserDto.UserSignupResponseDto signUp(UserSignUpRequest userDto) {
+    public UserDto.UserSignupResponseDto signUp(UserSignUpRequest request) {
         // 이메일 중복 검증
-        if (userRepository.existsByEmail(userDto.getEmail())){
+        if (userRepository.existsByEmail(request.getEmail())){
             throw new CustomException(ErrorCode.DUPLICATE_EMAIL);}
 
-        // 비밀번호 일치 확인
-        if(!userDto.getPassword().equals(userDto.getConfirmPassword())){
-            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
-        }
+        request.validatePassword();
 
         // 핸드폰 번호 중복 확인
-        if(userRepository.existsByPhoneNumber(userDto.getPhoneNumber())){
+        if(userRepository.existsByPhoneNumber(request.getPhoneNumber())){
             throw new CustomException(ErrorCode.DUPLICATE_PHONE);
         }
 
-        User newUser = userDto.toEntity();
+        User newUser = request.toEntity();
 
         // 비밀번호 암호화 후 저장
-        newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
+        newUser.encodePassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
 
         // 나무 객체 생성
-        Tree tree = new Tree();
-        tree.setTreeName(newUser.getNickname());
-        tree.setUser(newUser);
-        tree.setTreeLevel(1);
-        tree.setTreeGrowth(0);
-        tree.setWater(0);
+        Tree tree = Tree.builder()
+                .treeName(request.getNickname())
+                .treeLevel(0)
+                .treeGrowth(0)
+                .water(0)
+                .build();
 
-        newUser.setTree(tree);
-        treeRepository.save(tree);
+        newUser.connectTree(tree);
         userRepository.save(newUser);
 
         return UserDto.UserSignupResponseDto.builder()
@@ -80,19 +74,17 @@ public class UserService {
     }
 
     // 로그인
-    public UserDto.UserLoginResponseDto logIn(UserLoginRequest userDto){
-        User user = userRepository.findByEmail(userDto.getEmail())
+    public UserDto.UserLoginResponseDto logIn(UserLoginRequest request){
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if (userDto.getPassword() == null || !bCryptPasswordEncoder.matches(userDto.getPassword(), user.getPassword())) {
+        if (request.getPassword() == null || !bCryptPasswordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
         }
 
         String accessToken = tokenProvider.createToken(user.getEmail());
         String refreshToken = tokenProvider.createRefreshToken(user.getEmail());
-
-        user.setRefreshToken(refreshToken); // User 엔티티에 토큰 저장
-        userRepository.save(user);
+        user.updateRefreshToken(refreshToken); // User 엔티티에 토큰 저장
 
         return UserDto.UserLoginResponseDto.builder()
                 .userId(user.getId())
@@ -106,11 +98,11 @@ public class UserService {
     public void logout(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        user.setRefreshToken(null);
-        userRepository.save(user);
+        user.clearRefreshToken();
     }
 
     // 로그아웃 후 토큰 검증
+    @Transactional(readOnly = true)
     public void validateAndRevokeRefresh(String email, String clientRefreshToken) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -118,7 +110,6 @@ public class UserService {
         if (user.getRefreshToken() == null) {
             throw new CustomException(ErrorCode.INVALID_TOKEN); // 이미 로그아웃됨
         }
-
         if (!user.getRefreshToken().equals(clientRefreshToken)) {
             throw new CustomException(ErrorCode.INVALID_TOKEN); // 토큰 불일치
         }
@@ -128,28 +119,25 @@ public class UserService {
     public void deleteUser(String email){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
-
         userRepository.delete(user);
     }
 
     // 회원가입 후 뱃지 획득
     public void firstBadge(Long userId){
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(()-> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Badge badge = badgeRepository.findByName("에코스텝 비기너")
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 뱃지입니다."));
+                .orElseThrow(()-> new CustomException(ErrorCode.BADGE_NOT_FOUND));
 
         if (userBadgeRepository.existsByUserAndBadge(user, badge)) {
-            throw new IllegalStateException("이미 해당 뱃지를 보유하고 있습니다.");
+            throw new CustomException(ErrorCode.USER_BADGE_ALREADY_EXISTS);
         }
 
         UserBadge userBadge = new UserBadge();
         userBadge.setUser(user);
         userBadge.setBadge(badge);
         userBadge.setAwardedAt(LocalDate.now());
-
         userBadgeRepository.save(userBadge);
     }
-
 }
