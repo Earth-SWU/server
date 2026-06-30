@@ -10,8 +10,6 @@ import java.util.Collections;
 
 @Entity
 @Getter
-@Setter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "user")
 public class User extends BaseEntity implements UserDetails {
@@ -51,6 +49,20 @@ public class User extends BaseEntity implements UserDetails {
         this.phoneNumber = phoneNumber;
         this.nickname = nickname;
         this.major = major;
+    }
+
+    public void encodePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+    public void updateRefreshToken(String refreshToken){
+        this.refreshToken = refreshToken;
+    }
+    public void clearRefreshToken() {
+        this.refreshToken = null;
+    }
+    public void connectTree(Tree tree) {
+        this.tree = tree;
+        tree.setUserInternal(this);
     }
 
     @Override
