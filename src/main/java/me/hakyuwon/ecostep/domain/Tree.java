@@ -35,9 +35,6 @@ public class Tree extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private static final int WATER_GROWTH = 5;  // 물 1개당 성장 %
-    private static final int FERTILIZER_GROWTH = 10;  // 비료 1개당 성장 %
-
     @Builder
     public Tree(String treeName, int treeGrowth, int treeLevel, int water, int fertilizer) {
         this.treeName = treeName;
@@ -50,6 +47,30 @@ public class Tree extends BaseEntity {
     public void applyItems(int waterGain, int fertilizerGain) {
         this.water += waterGain;
         this.fertilizer += fertilizerGain;
+    }
+
+    public void useWater() {
+        this.water--;
+        this.treeGrowth += 5;
+        checkLevelUp();
+    }
+
+    public void useFertilizer(){
+        this.fertilizer--;
+        this.treeGrowth += 10;
+        checkLevelUp();
+    }
+
+    public void checkLevelUp(){
+        while(this.treeGrowth>=100){
+            if(this.treeLevel<4){
+                this.treeLevel++;
+                this.treeGrowth -= 100;
+            }else{
+                this.treeGrowth = 100; // 만렙 도달 시 성장도 100% 고정
+                break;
+            }
+        }
     }
 
     public void setUserInternal(User user) {

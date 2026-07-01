@@ -5,8 +5,10 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Getter
@@ -42,6 +44,9 @@ public class User extends BaseEntity implements UserDetails {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Tree tree;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserBadge> userBadges = new ArrayList<>();
+
     @Builder
     public User(String email, String password, String phoneNumber, String nickname, String major) {
         this.email = email;
@@ -63,6 +68,10 @@ public class User extends BaseEntity implements UserDetails {
     public void connectTree(Tree tree) {
         this.tree = tree;
         tree.setUserInternal(this);
+    }
+    public void addBadges(UserBadge userBadge) {
+        this.userBadges.add(userBadge);
+        userBadge.setInternalUser(this);
     }
 
     @Override

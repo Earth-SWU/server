@@ -2,8 +2,6 @@ package me.hakyuwon.ecostep.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -14,6 +12,8 @@ public enum ErrorCode {
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     INVALID_PHONE_FORMAT(HttpStatus.BAD_REQUEST, "전화번호 형식이 잘못되었습니다."),
     INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "이메일 형식이 올바르지 않습니다."),
+    INSUFFICIENT_WATER(HttpStatus.BAD_REQUEST, "물이 부족합니다."),
+    INSUFFICIENT_FERTILIZER(HttpStatus.BAD_REQUEST, "비료가 부족합니다."),
 
     // 401 Unauthorized
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),

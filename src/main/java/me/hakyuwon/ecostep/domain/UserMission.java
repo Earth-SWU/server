@@ -37,4 +37,6 @@ public class UserMission {
         this.carbonReduction = carbonReduction;
         this.completedAt = completedAt;
     }
+
+
 }

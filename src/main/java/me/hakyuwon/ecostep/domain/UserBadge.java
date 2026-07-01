@@ -1,14 +1,15 @@
 package me.hakyuwon.ecostep.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Getter
-@Setter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name="userBadge")
 public class UserBadge {
     @Id
@@ -24,4 +25,8 @@ public class UserBadge {
     private Badge badge; // 부여된 뱃지
 
     private LocalDate awardedAt; // 뱃지 부여 일자
+
+    public void setInternalUser(User user){
+        this.user = user;
+    }
 }

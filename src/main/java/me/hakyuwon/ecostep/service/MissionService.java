@@ -204,12 +204,11 @@ public class MissionService {
                 newBadge.setBadgeType(badgeType);
                 newBadge.setDescription(badgeType.getName() + "을(를) 달성했습니다!");
 
-                UserBadge userBadge = new UserBadge();
-                userBadge.setUser(user);
-                userBadge.setBadge(newBadge);
-                userBadge.setAwardedAt(LocalDate.now());
-
-                userBadgeRepository.save(userBadge);
+                UserBadge userBadge = UserBadge.builder()
+                        .badge(newBadge)
+                        .awardedAt(LocalDate.now())
+                        .build();
+                user.addBadges(userBadge);
             }
         }
             return ResponseEntity.ok("뱃지 지급 조건을 충족하지 않았습니다.");

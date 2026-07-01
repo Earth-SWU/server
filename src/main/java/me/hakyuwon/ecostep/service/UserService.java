@@ -1,5 +1,6 @@
 package me.hakyuwon.ecostep.service;
 
+import lombok.RequiredArgsConstructor;
 import me.hakyuwon.ecostep.config.jwt.TokenProvider;
 import me.hakyuwon.ecostep.domain.Badge;
 import me.hakyuwon.ecostep.domain.Tree;
@@ -11,7 +12,6 @@ import me.hakyuwon.ecostep.dto.UserSignUpRequest;
 import me.hakyuwon.ecostep.exception.CustomException;
 import me.hakyuwon.ecostep.exception.ErrorCode;
 import me.hakyuwon.ecostep.repository.BadgeRepository;
-import me.hakyuwon.ecostep.repository.TreeRepository;
 import me.hakyuwon.ecostep.repository.UserBadgeRepository;
 import me.hakyuwon.ecostep.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,6 +23,7 @@ import java.time.LocalDate;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -30,20 +31,13 @@ public class UserService {
     private final UserBadgeRepository userBadgeRepository;
     private final BadgeRepository badgeRepository;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, TokenProvider tokenProvider, UserBadgeRepository userBadgeRepository, BadgeRepository badgeRepository) {
-        this.userRepository = userRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.tokenProvider = tokenProvider;
-        this.userBadgeRepository = userBadgeRepository;
-        this.badgeRepository = badgeRepository;
-    }
-
     // 회원가입
     public UserDto.UserSignupResponseDto signUp(UserSignUpRequest request) {
         // 이메일 중복 검증
         if (userRepository.existsByEmail(request.getEmail())){
             throw new CustomException(ErrorCode.DUPLICATE_EMAIL);}
 
+        // 비밀번호 검증
         request.validatePassword();
 
         // 핸드폰 번호 중복 확인
@@ -134,10 +128,10 @@ public class UserService {
             throw new CustomException(ErrorCode.USER_BADGE_ALREADY_EXISTS);
         }
 
-        UserBadge userBadge = new UserBadge();
-        userBadge.setUser(user);
-        userBadge.setBadge(badge);
-        userBadge.setAwardedAt(LocalDate.now());
-        userBadgeRepository.save(userBadge);
+        UserBadge userBadge = UserBadge.builder()
+                .badge(badge)
+                .awardedAt(LocalDate.now())
+                .build();
+        user.addBadges(userBadge);
     }
 }
