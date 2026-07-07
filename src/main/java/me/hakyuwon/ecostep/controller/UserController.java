@@ -55,17 +55,14 @@ public class UserController {
     // 로그아웃
     @PostMapping("/api/users/logout")
     public ResponseEntity<String> logout(@AuthenticationPrincipal UserDetails userDetails) {
-        String email = userDetails.getUsername();
-        userService.logout(email);
-
+        userService.logout(userDetails.getUsername());
         return ResponseEntity.ok("로그아웃 성공");
     }
 
     // 회원 탈퇴
     @DeleteMapping("/api/users/delete")
     public ResponseEntity<String> deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
-        String email = userDetails.getUsername();
-        userService.deleteUser(email);
+        userService.deleteUser(userDetails.getUsername());
         return ResponseEntity.ok("회원 탈퇴 성공");
     }
 
@@ -124,12 +121,6 @@ public class UserController {
     // 회원가입 이후, 첫 뱃지 지급 api
     @PostMapping("/api/beginner/{userId}")
     public ResponseEntity<String> assignBeginnerBadge(@PathVariable Long userId, @AuthenticationPrincipal UserDetails userDetails) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        if (!user.getEmail().equals(userDetails.getUsername())) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
-
         userService.firstBadge(userId);
         return ResponseEntity.ok("에코스텝 비기너");
     }
