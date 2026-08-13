@@ -42,7 +42,6 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users/login",
                                 "/api/users/signup",
-                                "/api/users/delete",
                                 "/api/email-check",
                                 "/api/verify-code",
                                 "/swagger/**",
