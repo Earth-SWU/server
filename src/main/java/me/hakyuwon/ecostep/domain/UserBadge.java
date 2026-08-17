@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name="userBadge")
+@Table(name="user_badge")
 public class UserBadge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
