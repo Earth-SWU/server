@@ -21,6 +21,7 @@
 <br/>
 
 ## 🛠️ Tech Stack
+<img width="1920" height="1080" alt="algorithm presentation_1" src="https://github.com/user-attachments/assets/6f8e5137-5bcf-4bd5-809c-d8e58ac52790" />
 
 ![Java](https://img.shields.io/badge/Java_17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot_3.2.1-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
