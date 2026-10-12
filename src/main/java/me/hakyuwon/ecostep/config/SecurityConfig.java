@@ -45,7 +45,8 @@ public class SecurityConfig {
                                 "/api/email-check",
                                 "/api/verify-code",
                                 "/swagger/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/api/test/kafka/**"
                         ).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
