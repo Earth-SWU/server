@@ -47,6 +47,9 @@ public class User extends BaseEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserBadge> userBadges = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserMission> userMissions = new ArrayList<>();
+
     @Builder
     public User(String email, String password, String phoneNumber, String nickname, String major) {
         this.email = email;

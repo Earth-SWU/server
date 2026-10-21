@@ -1,33 +1,27 @@
 package me.hakyuwon.ecostep.enums;
 
 import lombok.Getter;
-import me.hakyuwon.ecostep.domain.Badge;
-
-import java.util.Arrays;
+import me.hakyuwon.ecostep.exception.CustomException;
+import me.hakyuwon.ecostep.exception.ErrorCode;
 
 @Getter
 public enum MissionType {
-    ATTENDANCE(1L, "출석 미션"),
-    TUMBLER(2L, "텀블러 사용"),
-    WALK(3L, "5000보 이상 걷기"),
-    STAIR(4L, "계단 이용하기"),
-    OXQUIZ(5L, "ox 퀴즈 풀기"),
-    CHOICEQUIZ(6L, "객관식 퀴즈 풀기"),
-    ECODIARY(7L,"환경 일기 쓰기");
+    ATTENDANCE(1L, "출석 미션",RewardType.WATER),
+    TUMBLER(2L, "텀블러 사용",RewardType.FERTILIZER),
+    WALK(3L, "5000보 이상 걷기",RewardType.WATER),
+    STAIR(4L, "계단 이용하기",RewardType.FERTILIZER),
+    OXQUIZ(5L, "ox 퀴즈 풀기",RewardType.WATER),
+    CHOICEQUIZ(6L, "객관식 퀴즈 풀기",RewardType.WATER),
+    ECODIARY(7L,"환경 일기 쓰기",RewardType.FERTILIZER);
 
     private final Long missionId;
     private final String description;
+    private final RewardType rewardType;
 
-    MissionType(Long missionId, String description) {
+    MissionType(Long missionId, String description, RewardType rewardType) {
         this.missionId = missionId;
         this.description = description;
-    }
-
-    public static MissionType fromId(Long missionId) {
-        return Arrays.stream(values())
-                .filter(type -> type.getMissionId().equals(missionId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID에 맞는 MissionType이 없습니다."));
+        this.rewardType = rewardType;
     }
 
     // MissionType에 맞는 뱃지 타입을 반환하는 메서드
@@ -40,9 +34,9 @@ public enum MissionType {
             case WALK:
                 return BadgeType.WALKING_CHAMP;
             case STAIR:
-                return BadgeType.WALKING_CHAMP;
+                return BadgeType.STAIR_CHAMP;
             default:
-                throw new IllegalArgumentException("해당 미션에 맞는 뱃지가 존재하지 않습니다.");
+                throw new CustomException(ErrorCode.BADGE_NOT_FOUND);
         }
     }
 
@@ -57,7 +51,7 @@ public enum MissionType {
             case STAIR:
                 return "계단 챔피언";
             default:
-                throw new IllegalArgumentException("해당 미션에 맞는 뱃지가 존재하지 않습니다.");
+                throw new CustomException(ErrorCode.BADGE_NOT_FOUND);
         }
     }
 

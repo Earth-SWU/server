@@ -1,6 +1,5 @@
 package me.hakyuwon.ecostep.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,12 +25,10 @@ public class MissionDto {
     }
 
     @Getter
-    public static class MissionBadgeResponseDto{
-        private long missionCount;
+    public static class MissionCompletionResponseDto {
         private String missionMessage;
 
-        public MissionBadgeResponseDto(long missionCount, String missionMessage) {
-            this.missionCount = missionCount;
+        public MissionCompletionResponseDto(String missionMessage) {
             this.missionMessage = missionMessage;
         }
     }

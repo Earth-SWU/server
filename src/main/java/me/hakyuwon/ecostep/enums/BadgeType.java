@@ -1,10 +1,13 @@
 package me.hakyuwon.ecostep.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum BadgeType {
-    TUMBLER_MASTER("텀블러 선구자", 5),
-    RECEIPT_EXPERT("영수증 분석 전문가", 5),
-    WALKING_CHAMP("걷기 챔피언", 5),
     ATTENDANCE_ECOSTEP("에코스텝러", 5),
+    TUMBLER_MASTER("텀블러 선구자", 5),
+    WALKING_CHAMP("걷기 챔피언", 5),
+    STAIR_CHAMP("계단 챔피언",5),
     IAM_BEGINNER("에코스텝 비기너",null),
     IAM_MASTER("에코스텝 마스터",null);
 
@@ -14,13 +17,5 @@ public enum BadgeType {
     BadgeType(String name, Integer requiredCount) {
         this.name = name;
         this.requiredCount = requiredCount;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getRequiredCount() {
-        return requiredCount;
     }
 }
