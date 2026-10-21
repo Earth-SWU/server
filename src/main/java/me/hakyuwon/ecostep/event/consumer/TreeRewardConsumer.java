@@ -3,13 +3,14 @@ package me.hakyuwon.ecostep.event.consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.hakyuwon.ecostep.event.MissionCompletedEvent;
+import me.hakyuwon.ecostep.event.TreeRewardEventHandler;
 import me.hakyuwon.ecostep.service.TreeService;
 import org.springframework.kafka.annotation.KafkaListener;
 
 @Slf4j
 @RequiredArgsConstructor
 public class TreeRewardConsumer {
-    private final TreeService treeService;
+    private final TreeRewardEventHandler eventHandler;
 
     @KafkaListener(
             topics = "mission.completed",
@@ -17,14 +18,12 @@ public class TreeRewardConsumer {
     )
     public void consume(MissionCompletedEvent event) {
         log.info(
-                "나무 보상 처리 - userId: {}, missionId: {}",
+                "나무 이벤트 수신 - eventId: {}, userId: {}, missionId: {}",
+                event.eventId(),
                 event.userId(),
                 event.missionId()
         );
 
-        treeService.applyReward(
-                event.userId(),
-                event.missionId()
-        );
+        eventHandler.handle(event);
     }
 }

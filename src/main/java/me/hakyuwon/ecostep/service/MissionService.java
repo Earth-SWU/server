@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -95,6 +96,7 @@ public class MissionService {
 
         // Kafka 이벤트 발행
         MissionCompletedEvent event = new MissionCompletedEvent(
+                UUID.randomUUID().toString(),
                 userId,
                 missionId,
                 now
