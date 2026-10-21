@@ -7,6 +7,8 @@ import me.hakyuwon.ecostep.dto.MissionDto;
 import me.hakyuwon.ecostep.dto.StepDataDto;
 import me.hakyuwon.ecostep.enums.BadgeType;
 import me.hakyuwon.ecostep.enums.MissionType;
+import me.hakyuwon.ecostep.event.MissionCompletedEvent;
+import me.hakyuwon.ecostep.event.producer.MissionEventProducer;
 import me.hakyuwon.ecostep.exception.CustomException;
 import me.hakyuwon.ecostep.exception.ErrorCode;
 import me.hakyuwon.ecostep.repository.*;
@@ -31,6 +33,7 @@ public class MissionService {
     private final EcoDiaryRepository ecoDiaryRepository;
     private final BadgeRepository badgeRepository;
     private final UserBadgeRepository userBadgeRepository;
+    private final MissionEventProducer missionEventProducer;
 
     private static final String QR_AUTHENTICATION_CODE = "STAIRMISSION_001_2025";
     private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
@@ -90,28 +93,15 @@ public class MissionService {
 
         userMissionRepository.save(userMission);
 
-        applyTreeReward(user, missionId);
+        // Kafka 이벤트 발행
+        MissionCompletedEvent event = new MissionCompletedEvent(
+                userId,
+                missionId,
+                now
+        );
+        missionEventProducer.publish(event);
 
         return "미션이 완료되었습니다.";
-    }
-
-    // 나무 정보 갱신
-    public void applyTreeReward(User user, Long missionId) {
-        Tree tree = treeRepository.findByUser(user)
-                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
-
-        Mission mission = missionRepository.findById(missionId)
-                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
-
-        switch (mission.getMissionType().getRewardType()) {
-            case WATER -> tree.applyItems(1, 0);
-            case FERTILIZER -> tree.applyItems(0, 1);
-            case NONE -> {
-                return;
-            }
-        }
-
-        treeRepository.save(tree);
     }
 
     // 미션 실패 (퀴즈용)

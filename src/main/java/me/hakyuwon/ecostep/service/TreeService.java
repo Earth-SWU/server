@@ -1,11 +1,13 @@
 package me.hakyuwon.ecostep.service;
 
 import lombok.RequiredArgsConstructor;
+import me.hakyuwon.ecostep.domain.Mission;
 import me.hakyuwon.ecostep.domain.Tree;
 import me.hakyuwon.ecostep.domain.User;
 import me.hakyuwon.ecostep.dto.TreeResponseDto;
 import me.hakyuwon.ecostep.exception.CustomException;
 import me.hakyuwon.ecostep.exception.ErrorCode;
+import me.hakyuwon.ecostep.repository.MissionRepository;
 import me.hakyuwon.ecostep.repository.TreeRepository;
 import me.hakyuwon.ecostep.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TreeService {
     private final TreeRepository treeRepository;
     private final UserRepository userRepository;
+    private final MissionRepository missionRepository;
 
     // 나무 조회
     public TreeResponseDto getTreeInfo(Long userId) {
@@ -57,5 +60,30 @@ public class TreeService {
 
         tree.useFertilizer();
         return new TreeResponseDto(tree);
+    }
+
+    @Transactional
+    public void applyReward(Long userId, Long missionId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Mission mission = missionRepository.findById(missionId)
+                .orElseThrow(() ->
+                        new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        Tree tree = treeRepository.findByUser(user)
+                .orElseThrow(() ->
+                        new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        switch (mission.getMissionType().getRewardType()) {
+            case WATER -> tree.applyItems(1, 0);
+            case FERTILIZER -> tree.applyItems(0, 1);
+            case NONE -> {
+                return;
+            }
+        }
+
+        treeRepository.save(tree);
     }
 }
