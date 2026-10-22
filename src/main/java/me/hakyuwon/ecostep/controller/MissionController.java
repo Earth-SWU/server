@@ -80,13 +80,6 @@ public class MissionController {
         return ResponseEntity.ok(result);
     }
 
-    // 배지 지급
-    @PostMapping("/badge/check")
-    public ResponseEntity<String> checkBadge(@RequestParam Long missionId, @AuthenticationPrincipal User user) {
-        String result = missionService.checkBadge(user.getId(), missionId);
-        return ResponseEntity.ok(result);
-    }
-
     // 환경 일기 쓰기 미션
     @PostMapping("/eco-diary/complete")
     public ResponseEntity<String> writeDiary(@RequestBody DiaryDto dto, @AuthenticationPrincipal User user){

@@ -3,8 +3,7 @@ package me.hakyuwon.ecostep.event.consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.hakyuwon.ecostep.event.MissionCompletedEvent;
-import me.hakyuwon.ecostep.event.TreeRewardEventHandler;
-import me.hakyuwon.ecostep.service.TreeService;
+import me.hakyuwon.ecostep.event.handler.TreeRewardEventHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 
 @Slf4j

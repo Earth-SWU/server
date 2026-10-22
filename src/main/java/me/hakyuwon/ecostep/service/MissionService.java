@@ -165,41 +165,6 @@ public class MissionService {
         return completeMission(user.getId(), mission.getId());
     }
 
-    // 배지 체크 및 부여
-    public String checkBadge(Long userId, Long missionId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        Mission mission = missionRepository.findById(missionId)
-                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
-
-        // 사용자가 해당 미션을 수행한 횟수를 조회
-        long missionCount = userMissionRepository.countByUserAndMission(user, mission);
-
-        // 미션 타입에 맞는 배지 타입을 가져오기
-        BadgeType badgeType = mission.getMissionType().getBadgeType();
-
-        // 미션 수행 횟수가 조건을 만족하는지 확인
-        if (missionCount < badgeType.getRequiredCount()) {
-            return "뱃지 지급 조건을 충족하지 않았습니다.";
-        }
-
-        Badge badge = badgeRepository.findByName(mission.getMissionType().getBadgeName())
-                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
-
-        if (userBadgeRepository.existsByUserAndBadge(user, badge)) {
-            return "이미 획득한 배지입니다.";
-        }
-
-        // 사용자와 기존 배지를 연결
-        UserBadge userBadge = UserBadge.builder()
-                .badge(badge)
-                .awardedAt(LocalDate.now(KOREA_ZONE))
-                .build();
-
-        user.addBadges(userBadge);
-        return "배지를 획득했습니다.";
-    }
-
     // 환경 일기 미션
     public String keepEcoDiary(Long userId, Long missionId, DiaryDto dto) {
         if(!missionId.equals(7L)){

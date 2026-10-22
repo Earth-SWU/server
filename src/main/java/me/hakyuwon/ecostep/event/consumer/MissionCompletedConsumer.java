@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class MissionCompletedConsumer {
+    // test
     @KafkaListener(
             topics = "mission.completed",
             groupId = "ecostep-consumer"
